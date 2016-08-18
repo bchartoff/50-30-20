@@ -22,37 +22,62 @@
     <title>50-30-20</title>
     <link rel="stylesheet" href="css/foundation.css">
     <link rel="stylesheet" href="css/app.css">
+
+    <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed:300,400,700" rel="stylesheet">
+
+    <style>
+
+    h1, h2, h3, p, li {
+      font-family: 'Roboto Condensed', sans-serif;
+      color: #231f20;}
+
+    h1 {font-weight:400; font-size:4.0em;}
+    h2 {font-weight:300; font-size:3.2em;}
+    h3 {font-weight:700; font-size:1.2em;}
+    p, li {font-weight:400; font-size:1em;}
+
+    h3, .scenario p {text-align:center;}
+    .blue {color:#00a79d;}
+    .strong {font-size:1.6em; font-weight:700;}
+    .money-label {font-weight:400; font-size:.5em; color:#231f20;}
+    .left {float:left;}
+    .right {float:right;}
+    .clear {clear:both;}
+
+    </style>
+
+
   </head>
   <body>
 
-
-    <div class="row">
-      <div class="large-12 columns">
-        <h2>Scenario:</h2>
+    <div class="scenario">
+      <div class="row">
+        <div class="large-12 columns">
+          <h2>Scenario:</h2>
+        </div>
+        <div class="large-6 columns">
+          <h3>LOCATION:</h3>
+          <img class="map" />
+          <p class="strong">Baltimore, MD</p>
+          <p>Population: 622,793 
+          <p>Area: 92.98 mi&sup2;</p>
+        </div>
+        <div class="large-6 columns">
+          <h3>HOUSEHOLD:</h3>
+          <img class="fam" />
+          <p>Family of 4. Both adults work.</p>
+          <p>One child is 4, the other is 8.</p>
+        </div>
       </div>
-      <div class="large-6 columns">
-        <h3>LOCATION:</h3>
-        <img class="map" />
-        <p>Baltimore, MD</p>
-        <p>Population: 622,793 Area: 92.98 mi&sup2;</p>
+      <div class="row">
+        <div class="large-3 large-centered columns">
+          <h3>MEDIAN INCOME:</h3>
+          <p class="left blue strong">$69,402</p>
+          <p class="right blue strong">$4,577<span class="money-label">/month</span></p>
+          <p class="clear">$45,552 above federal poverty level based on the median per capita income.</p>
+        </div>
       </div>
-      <div class="large-6 columns">
-        <h3>HOUSEHOLD:</h3>
-        <img class="fam" />
-        <p>Family of 4. Both adults work.</p>
-        <p>One child is 4, the other is 8.</p>
-      </div>
-    </div>
-
-    <div class="row">
-      <div class="large-12 columns">
-        <h3>MEDIAN INCOME:</h3>
-        <p class>$69,402</p>
-        <p>$4,577<span class="money-label">/month</span></p>
-        <p>$45,552 above federal poverty level</p>
-        <p>based on the median per capita income.</p>
-      </div>
-    </div>
+  </div>
 
 
     <div class="row">
@@ -81,7 +106,7 @@
         <p>Taking the total amount spent on needs then figuring out if needs are under budget and what is left for wants and savings.</p>
       </div>
       <div class="large-12 columns">
-          <!-- draw graph here - consider alternate labeling solution? -->
+          <!-- draw graph here -->
       </div>
       <div class="large-12 columns">
         <p>Needs are $1,759 and 38% over the ideal budget which leaves this family little room for items they may want like a car or a cell phone or having any money to put towards savigns or debt repayment.</p>
@@ -89,7 +114,22 @@
     </div>
 
 
-<!-- Next: set up data structure, draw basic graphs, map all text numbers to data points, add alignment, separators, fonts, background colors, icons etc. -->
+<!-- 
+
+      still to do: 
+        set up static data structure w/ just baltimore
+        draw basic graphs
+        map all text numbers to data points
+        add alignment, separators, fonts, background colors, icons etc. 
+        implement city selection and extended data structure
+
+      open design needs:
+        project title section?
+        city selection interface
+        updating labeling scheme for "actual budget" section?
+        easing / animation guidance
+
+-->
 
 
 
@@ -97,7 +137,7 @@
 
 
 
-<!-- foundation defaults below - delete when basic layout is complete -->
+<!-- foundation defaults below - delete when layout is complete - be sure to check mobile -->
 
     <div class="row">
       <div class="large-12 columns">
