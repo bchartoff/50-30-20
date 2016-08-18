@@ -27,22 +27,47 @@
 
     <style>
 
-    h1, h2, h3, p, li {
-      font-family: 'Roboto Condensed', sans-serif;
-      color: #231f20;}
+      .scenario, .ideal, .actual, .needs {
+        border-top:solid #010101 3px;
+        border-bottom:solid #010101 3px;
+      }
 
-    h1 {font-weight:400; font-size:4.0em;}
-    h2 {font-weight:300; font-size:3.2em;}
-    h3 {font-weight:700; font-size:1.2em;}
-    p, li {font-weight:400; font-size:1em;}
+      .scenario {
+        margin-top:1em;
+      }
 
-    h3, .scenario p {text-align:center;}
-    .blue {color:#00a79d;}
-    .strong {font-size:1.6em; font-weight:700;}
-    .money-label {font-weight:400; font-size:.5em; color:#231f20;}
-    .left {float:left;}
-    .right {float:right;}
-    .clear {clear:both;}
+      .ideal, .actual {
+        background:#e8e8e8;
+      }
+
+      .needs {
+        background:#d1d3d4;
+      }
+      
+      .row {
+        margin-bottom:1em;
+      }
+
+      h1, h2, h3, p, li {
+        font-family: 'Roboto Condensed', sans-serif;
+        color: #231f20;}
+
+      h1 {font-weight:400; font-size:4.0em;}
+      h2 {font-weight:300; font-size:3.2em;}
+      h3 {font-weight:700; font-size:1.2em;}
+      p, li {font-weight:400; font-size:1em;}
+
+      h3, .scenario p {text-align:center;}
+      .blue {color:#00a79d;}
+      .strong {font-size:1.7em; font-weight:700;}
+      .money-label {font-weight:400; font-size:.5em; color:#231f20;}
+
+      img {display: block; margin: 1em auto;}
+
+      .left {float:left;}
+      .right {float:right;}
+      .clear {clear:both;}
+
 
     </style>
 
@@ -50,21 +75,21 @@
   </head>
   <body>
 
-    <div class="scenario">
+    <div class="row scenario">
       <div class="row">
         <div class="large-12 columns">
           <h2>Scenario:</h2>
         </div>
         <div class="large-6 columns">
           <h3>LOCATION:</h3>
-          <img class="map" />
+          <img class="map" src="./img/map.png" />
           <p class="strong">Baltimore, MD</p>
           <p>Population: 622,793 
           <p>Area: 92.98 mi&sup2;</p>
         </div>
         <div class="large-6 columns">
           <h3>HOUSEHOLD:</h3>
-          <img class="fam" />
+          <img class="fam" src="./img/fam.png" />
           <p>Family of 4. Both adults work.</p>
           <p>One child is 4, the other is 8.</p>
         </div>
@@ -80,7 +105,7 @@
   </div>
 
 
-    <div class="row">
+    <div class="row ideal">
       <div class="large-12 columns">
         <h2>Ideal Budget:</h2>
         <p>Monthly pay ($4,577) divided into what you should be spending in each category.</p>
@@ -90,7 +115,7 @@
       </div>
     </div>
 
-    <div class="row">
+    <div class="row needs">
       <div class="large-12 columns">
         <h2>Needs Total:</h2>
         <p>Adding each item in the needs category to find out what is being spend on average on necessities.</p>
@@ -100,7 +125,7 @@
       </div>
     </div>
 
-    <div class="row">
+    <div class="row actual">
       <div class="large-12 columns">
         <h2>Actual Budget:</h2>
         <p>Taking the total amount spent on needs then figuring out if needs are under budget and what is left for wants and savings.</p>
@@ -120,7 +145,6 @@
         set up static data structure w/ just baltimore
         draw basic graphs
         map all text numbers to data points
-        add alignment, separators, fonts, background colors, icons etc. 
         implement city selection and extended data structure
 
       open design needs:
