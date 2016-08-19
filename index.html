@@ -20,9 +20,10 @@
 
 
     <title>50-30-20</title>
+
+    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
     <link rel="stylesheet" href="css/foundation.css">
     <link rel="stylesheet" href="css/app.css">
-
     <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed:300,400,700" rel="stylesheet">
 
     <style>
@@ -111,7 +112,7 @@
         <p>Monthly pay ($4,577) divided into what you should be spending in each category.</p>
       </div>
       <div class="large-12 columns">
-          <!-- draw graph here -->
+        <div id="graph-ideal"></div>
       </div>
     </div>
 
@@ -159,20 +160,41 @@
       baltfam.transit = 138;
       baltfam.childcare = 1157;
       baltfam.difference = baltfam.income - 23850;
-      baltfam.fifty = baltfam.takehome * 0.5;
-      baltfam.thirty = baltfam.takehome * 0.3;
-      baltfam.twenty = baltfam.takehome * 0.2;
+      baltfam.fifty = Math.round(baltfam.takehome * 0.5);
+      baltfam.thirty = Math.round(baltfam.takehome * 0.3);
+      baltfam.twenty = Math.round(baltfam.takehome * 0.2);
       baltfam.needs = baltfam.housing + baltfam.health + baltfam.grocery + baltfam.transit + baltfam.childcare;
       baltfam.lo = baltfam.takehome - baltfam.needs;
-      baltfam.lowants = baltfam.lo * 0.6;
-      baltfam.losaves = baltfam.lo * 0.4;
-      baltfam.needsperc = baltfam.needs / baltfam.takehome;
-      baltfam.wantsperc = baltfam.lowants / baltfam.takehome;
-      baltfam.savesperc = baltfam.losaves / baltfam.takehome;
-      baltfam.overneeds = baltfam.needs - baltfam.fifty;
-      baltfam.overneedsperc = baltfam.needsperc - 0.5;
+      baltfam.lowants = Math.round(baltfam.lo * 0.6);
+      baltfam.losaves = Math.round(baltfam.lo * 0.4);
+      baltfam.needsperc = (Math.round((baltfam.needs / baltfam.takehome)*100))/100;
+      baltfam.wantsperc = (Math.round((baltfam.lowants / baltfam.takehome)*100))/100;
+      baltfam.savesperc = (Math.round((baltfam.losaves / baltfam.takehome)*100))/100;
+      baltfam.overneeds = Math.round(baltfam.needs - baltfam.fifty);
+      baltfam.overneedsperc = (Math.round((baltfam.needsperc - 0.5)*100))/100;
 
     // draw ideal budget graph
+
+    var data = [baltfam.fifty, baltfam.thirty, baltfam.twenty]
+
+    var scaleWidth = d3.scale.linear()
+      .domain([0, d3.sum(data)])
+      .range([0, 1000]); // change 1000 to width of container
+
+    var svg = d3.select("#graph-ideal")
+      .append("svg")
+        .data(data)
+        .attr("width", 1000) // this should also be width of container
+        .attr("height", 100)
+      svg.selectAll("rect")
+        .data(data)
+      .enter().append("rect")
+        .attr("x", function(d) {return }) // scale this by previous rect for positioning
+        .attr("y", 0)
+        .attr("width", function(d) {return scaleWidth(d); }) 
+        .attr("height", 100)
+        .style("fill", "#4F92AD") // color this by which segment we're looking at
+
 
 
     // draw needs graphs
@@ -194,7 +216,7 @@
         draw basic graphs
         map all text numbers to data points - jquery
         styling pass / convert to sass?
-        implement city selection and extended data structure
+        object type, data input (csv?) and city / household selection
 
       open design needs:
         project title section?
