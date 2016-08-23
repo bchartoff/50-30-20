@@ -177,7 +177,7 @@
 
       // width and height (reversed yay :\ )
       var w = 100;
-      var h = 1200; // HEY YOU pull this from the container
+      var h = 1170; // HEY YOU pull this from the container, not this magic number
 
       // data
       var dataset = [
@@ -234,9 +234,13 @@
         .data(function(d) { return d; })
         .enter().append("rect")
           .attr("x", 0)
-          .attr("y", function(d) { return yScale(d.y0); })
+          .attr("y", function(d) { return yScale(d.y0)+100; })
           .attr("height", function(d) { return yScale(d.y); })
           .attr("width", xScale.rangeBand())
+
+
+/*
+
         .append("line")
           .attr("x1", 100)
           .attr("y1", 100)
@@ -244,8 +248,8 @@
           .attr("y2", function(d) { return yScale(d.y); })
           .style("stroke-width", 2)
           .style("stroke", "red")
-          .style("fill", "none");            
-
+          .style("fill", "none"); 
+*/
 
     // draw needs graphs
 
