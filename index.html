@@ -175,11 +175,11 @@
 
     // draw ideal budget graph
 
-      //Width and height
-      var w = 500;
-      var h = 400;
+      // width and height (reversed yay :\ )
+      var w = 100;
+      var h = 1200; // HEY YOU pull this from the container
 
-      //Original data
+      // data
       var dataset = [
         [
            { x: 0, y: baltfam.fifty }
@@ -192,13 +192,11 @@
         ]
       ];
 
-      //Set up stack method
+      // stack that data
       var stack = d3.layout.stack();
-
-      //Data, stacked
       stack(dataset);
 
-      //Set up scales
+      // set up scales 
       var xScale = d3.scale.ordinal()
         .domain(d3.range(dataset[0].length))
         .rangeRoundBands([0, w], 0.05);
@@ -213,14 +211,14 @@
         ])
         .range([0, h]);
         
-      //Easy colors accessible via a 10-step ordinal scale
+      // update to feed correct colors
       var colors = d3.scale.category10();
     
-      //Create SVG element
+      // create SVG element
       var svg = d3.select("#graph-ideal")
             .append("svg")
-            .attr("width", w)
-            .attr("height", h);
+            .attr("width", h)     // note: these are reversed!
+            .attr("height", w);
   
       // Add a group for each row of data
       var groups = svg.selectAll("g")
@@ -228,99 +226,26 @@
         .enter()
         .append("g")
         .style("fill", function(d, i) { return colors(i); })
-        svg.selectAll('g').attr("transform","rotate(270 200,200)");
+        svg.selectAll('g').attr("transform","rotate(270 0,100)"); 
+          // the rotation, note 3rd parameter, this needs to be same as w (actual height)
   
-      // Add a rect for each data value
+      // add a rect for each data value
       var rects = groups.selectAll("rect")
         .data(function(d) { return d; })
-        .enter()
-        .append("rect")
-        .attr("x", function(d, i) {
-          return xScale(i);
-        })
-        .attr("y", function(d) {
-          return yScale(d.y0);
-        })
-        .attr("height", function(d) {
-          return yScale(d.y);
-        })
-        .attr("width", xScale.rangeBand());
-            
+        .enter().append("rect")
+          .attr("x", 0)
+          .attr("y", function(d) { return yScale(d.y0); })
+          .attr("height", function(d) { return yScale(d.y); })
+          .attr("width", xScale.rangeBand())
+        .append("line")
+          .attr("x1", 100)
+          .attr("y1", 100)
+          .attr("x2", 0) 
+          .attr("y2", function(d) { return yScale(d.y); })
+          .style("stroke-width", 2)
+          .style("stroke", "red")
+          .style("fill", "none");            
 
-
-/* 
-    var data = [
-      [
-        { x: 0, y: baltfam.fifty }
-      ],
-      [ 
-        { x: 0, y: baltfam.thirty }
-      ],
-      [
-        { x: 0, y: baltfam.twenty }
-      ]
-    ];
-
-    var stack = d3.layout.stack();
-    stack(data);
-
-    var w = 300;
-    var h = 500;
-
-
-    var xScale = d3.scale.linear()
-      .domain([0,       
-        d3.max(data, function(d) {
-          return d3.max(d, function(d) {
-            return d.y0 + d.y;
-          });
-        })
-      ])
-      .range([0, h]);
-
-
-    var svg = d3.select("#graph-ideal")
-      .append("svg")
-        .data(data)
-        .attr("width", 1000) // this should also be width of container
-        .attr("height", 100);
-
-
-
-    var rects = svg.selectAll("rect")
-      .data(function(d) { return d; })
-      .enter().append("rect")
-      .attr("y", function(d) { return xScale(d.y0); })
-      .attr("x", 0)
-      .attr("height", function(d) { return xScale(d.y); })
-      .attr("width", 0)
-      .attr("fill", "#4F92AD")
-
-
-       */
-
-/*
-    var scaleWidth = d3.scale.linear()
-      .domain([0, d3.sum(data)])
-      .range([0, 1000]); // change 1000 to width of container
-
-
-
-    var svg = d3.select("#graph-ideal")
-      .append("svg")
-        .data(data)
-        .attr("width", 1000) // this should also be width of container
-        .attr("height", 100)
-      svg.selectAll("rect")
-        .data(data)
-      .enter().append("rect")
-        .attr("x", function(d) {return }) // scale this by previous rect for positioning
-        .attr("y", 0)
-        .attr("width", function(d) {return scaleWidth(d); }) 
-        .attr("height", 100)
-        .style("fill", "#4F92AD") // color this by which segment we're looking at
-
-*/
 
     // draw needs graphs
 
