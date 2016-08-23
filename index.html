@@ -179,7 +179,7 @@
       var w = 100;
       var h = 1170; // HEY YOU pull this from the container, not this magic number
 
-      // data
+      // data yay so sophisticated
       var dataset = [
         [
            { x: 0, y: baltfam.fifty }
@@ -210,10 +210,20 @@
           })
         ])
         .range([0, h]);
-        
 
       var colors = d3.scale.category10();       // update to feed correct colors
     
+      // select first or last in a series
+      d3.selection.prototype.first = function() {
+        return d3.select(this[0][0]);
+      };
+
+      d3.selection.prototype.last = function() {
+        var last = this.size() - 1;
+        return d3.select(this[0][last]);
+      };
+
+
       // create SVG element
       var svg = d3.select("#graph-ideal")
             .append("svg")
@@ -234,7 +244,7 @@
         .data(function(d) { return d; })
         .enter().append("rect")
           .attr("x", -120) // -120 is to shift chart down to make way for annotation
-          .attr("y", function(d) { return yScale(d.y0)+100; }) // +100 is to kill mysterious offset
+          .attr("y", function(d) { return yScale(d.y0)+100; }) // +100 is to kill mysterious left offset
           .attr("height", function(d) { return yScale(d.y); })
           .attr("width", xScale.rangeBand());
 
@@ -244,14 +254,26 @@
         .enter().append("line")
         .attr("x1", -120) // shift lines to bottom to match rects
         .attr("x2", 200) // line is 320 px long, see?
-        .attr("y1", function(d) { return yScale(d.y0)+100; }) // +100 for mysterious offset again
+        .attr("y1", function(d) { return yScale(d.y0)+100; }) // +100 for mysterious left offset again
         .attr("y2", function(d) { return yScale(d.y0)+100; })        
         .style("stroke-width", 4)
         .style("stroke", "white")
         .style("fill", "none");
 
-        // add final line
-        // add offset for initial line (truncated stroke...)
+      // add the last line at the end of the graph
+      var lastLine = svg.append("line") // interestingly, this line is oriented normally, hence y is actually y here, x is x etc.
+        .attr("y1", 0) 
+        .attr("y2", 320) 
+        .attr("x1", 1168) // this number is bullshit, needs to pull from width of svg - 2 for offset
+        .attr("x2", 1168) 
+        .style("stroke-width", 4)
+        .style("stroke", "white")
+        .style("fill", "none");
+
+      // fix the position of the first line odf the graph
+      var lineFix = svg.selectAll('line'); // shift that first line 2px so it doesn't fall off the left side
+      lineFix.first()
+        .attr('transform', 'translate(0,2)');
 
 
 
@@ -262,6 +284,10 @@
 
     // draw actual budget graph
 
+
+        // add final line
+        // add offset for initial line (truncated stroke...)
+        // fix colors
 
 
 
