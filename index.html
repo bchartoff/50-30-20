@@ -211,14 +211,14 @@
         ])
         .range([0, h]);
         
-      // update to feed correct colors
-      var colors = d3.scale.category10();
+
+      var colors = d3.scale.category10();       // update to feed correct colors
     
       // create SVG element
       var svg = d3.select("#graph-ideal")
             .append("svg")
-            .attr("width", h)     // note: these are reversed!
-            .attr("height", w);
+            .attr("width", h)     // note: these are reversed! that is ok for now.
+            .attr("height", w+120); // +120 is to open up vertical space for annotation
   
       // Add a group for each row of data
       var groups = svg.selectAll("g")
@@ -227,29 +227,35 @@
         .append("g")
         .style("fill", function(d, i) { return colors(i); })
         svg.selectAll('g').attr("transform","rotate(270 0,100)"); 
-          // the rotation, note 3rd parameter, this needs to be same as w (actual height)
+          // in the rotation, note 3rd parameter, this needs to be same as w (actual height) currently 100
   
       // add a rect for each data value
       var rects = groups.selectAll("rect")
         .data(function(d) { return d; })
         .enter().append("rect")
-          .attr("x", 0)
-          .attr("y", function(d) { return yScale(d.y0)+100; })
+          .attr("x", -120) // -120 is to shift chart down to make way for annotation
+          .attr("y", function(d) { return yScale(d.y0)+100; }) // +100 is to kill mysterious offset
           .attr("height", function(d) { return yScale(d.y); })
-          .attr("width", xScale.rangeBand())
+          .attr("width", xScale.rangeBand());
+
+      // draw a line over the start of every rect
+      var lines = groups.selectAll("line")
+        .data(function(d) { return d; })
+        .enter().append("line")
+        .attr("x1", -120) // shift lines to bottom to match rects
+        .attr("x2", 200) // line is 320 px long, see?
+        .attr("y1", function(d) { return yScale(d.y0)+100; }) // +100 for mysterious offset again
+        .attr("y2", function(d) { return yScale(d.y0)+100; })        
+        .style("stroke-width", 4)
+        .style("stroke", "white")
+        .style("fill", "none");
+
+        // add final line
+        // add offset for initial line (truncated stroke...)
 
 
-/*
 
-        .append("line")
-          .attr("x1", 100)
-          .attr("y1", 100)
-          .attr("x2", 0) 
-          .attr("y2", function(d) { return yScale(d.y); })
-          .style("stroke-width", 2)
-          .style("stroke", "red")
-          .style("fill", "none"); 
-*/
+
 
     // draw needs graphs
 
