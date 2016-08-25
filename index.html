@@ -327,14 +327,26 @@
     // draw needs graphs
 
       var dataneeds = [
-        [
-          { x: 0, y: baltfam.needs, t1: , t2: "Needs:" }
+        [                                         // total spent already for each line
+          { x: 0, y: 0, t1: "", t2: "" },                          
+          { x: 0, y: baltfam.housing, t1: "", t2: "" },              
+          { x: 0, y: baltfam.housing + baltfam.health, t1: "", t2: "" },               
+          { x: 0, y: baltfam.housing + baltfam.health + baltfam.grocery, t1: "", t2: "" },               
+          { x: 0, y: baltfam.housing + baltfam.health + baltfam.grocery + baltfam.transit, t1: "", t2: "" }            
         ],
-        [ 
-          { x: 0, y: baltfam.lowants, t1: , t2: "Wants:" }
+        [                                         // value being highlighted in each line
+          { x: 0, y: baltfam.housing, t1: "", t2: "" },  //
+          { x: 0, y: baltfam.health, t1: "", t2: "" },  //
+          { x: 0, y: baltfam.grocery, t1: "", t2: "" },  //
+          { x: 0, y: baltfam.transit, t1: "", t2: "" }, //
+          { x: 0, y: baltfam.childcare, t1: "", t2: "" }  //
         ],
-        [
-          { x: 0, y: baltfam.losaves, t1: , t2: "Saves:" }
+        [                                         // remainder after total spent 
+          { x: 0, y: baltfam.takehome - baltfam.housing, t1: "", t2: "" },
+          { x: 0, y: baltfam.takehome - baltfam.housing - baltfam.health, t1: "", t2: "" },
+          { x: 0, y: baltfam.takehome - baltfam.housing - baltfam.health - baltfam.grocery, t1: "", t2: "" },
+          { x: 0, y: baltfam.takehome - baltfam.housing - baltfam.health - baltfam.grocery - baltfam.transit, t1: "", t2: "" },
+          { x: 0, y: baltfam.takehome - baltfam.housing - baltfam.health - baltfam.grocery - baltfam.transit - baltfam.childcare, t1: "", t2: "" }
         ]
       ];
 
@@ -361,18 +373,19 @@
       var svg = d3.select("#graph-needs")
             .append("svg")
             .attr("width", h)         // note: these are reversed! that is ok for now.
-            .attr("height", w+120);   // +120 is to open up vertical space for annotation
+            .attr("height", w+1200);   // +1200 fudge, this is full height of needs graph
   
       // add a group for each row of data
       var groups = svg.selectAll("g")
         .data(dataneeds)
         .enter()
         .append("g")
-        .style("fill", function(d, i) {                   // replace this with actual color function at some point
+        .attr("x", function(d) { return d.x + 100; }) // +100 for mysterious left offset again
+        .style("fill", function(d, i) {                   
           var fillColor;                                  
-            if (i == 0) { fillColor = "#f8bc50";}         // yellow
-            else if (i == 1) { fillColor = "#c66728";}    // orange
-            else if (i == 2) { fillColor = "#ab4949";}    // red
+            if (i == 0) { fillColor = "#f8bc50";}      
+            else if (i == 1) { fillColor = "#c66728";}    
+            else if (i == 2) { fillColor = "#ab4949";}    
           return fillColor;      
         });
         svg.selectAll('g').attr("transform","rotate(270 0,100)"); // rotate the whole shit lol
@@ -434,12 +447,6 @@
         .attr("dx", function(d) { return yScale(d[0].y0)+10; })  // position horizontally
         .attr("dy", "100")                                       // shift down from top of svg
         .text(function(d) { return "$" + d[0].y; });
-
-
-
-
-
-
 
 
 
