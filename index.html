@@ -354,16 +354,12 @@
       ];
 
 
-
-
-
-
       var stack = d3.layout.stack();
       stack(dataneeds);
 
       var xScale = d3.scale.ordinal()
         .domain(d3.range(dataneeds[0].length))
-        .rangeRoundBands([0, w], 0.05);
+        .rangeRoundBands([0, h], 0.05); // This is actually the Y scale
 
       var yScale = d3.scale.linear()
         .domain([0,
@@ -373,7 +369,7 @@
             });
           })
         ])
-        .range([0, h]);
+        .range([0, w]); // This is actually the X Scale
 
 
       var svg = d3.select("#graph-needs")
@@ -392,19 +388,20 @@
           return fillColor;      
         });
 
+
       var rects = groups.selectAll("rect")
         .data(function(d) {return d;})
         .enter().append("rect")
-        .attr("x", function(d, i) {
+        .attr("y", function(d, i) {
           return xScale(i);
         })
-        .attr("y", function(d) {
+        .attr("x", function(d) {
           return yScale(d.y0);
         })
-        .attr("height", function(d) {
+        .attr("width", function(d) {
           return yScale(d.y);
         })
-        .attr("width", xScale.rangeBand());
+        .attr("height", xScale.rangeBand());
 
 
 
