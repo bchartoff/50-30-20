@@ -150,7 +150,7 @@
 
     <script type="text/javascript">
 
-    // setup stuff
+// setup stuff
 
     // static js object to store balitmore family data
     var baltfam = new Object();
@@ -203,7 +203,7 @@
 
 
 
-    // draw ideal budget graph
+// draw ideal budget graph
 
       // array of arrays to feed d3 stack layout
       var dataideal = [
@@ -324,43 +324,49 @@
 
 
 
-    // draw needs graphs
+// draw needs graphs
+
+
+
 
       var dataneeds = [
-        [                                         // total spent already for each line
-          { x: 0, y: 0, t1: "", t2: "" },                          
-          { x: 0, y: baltfam.housing, t1: "", t2: "" },              
-          { x: 0, y: baltfam.housing + baltfam.health, t1: "", t2: "" },               
-          { x: 0, y: baltfam.housing + baltfam.health + baltfam.grocery, t1: "", t2: "" },               
-          { x: 0, y: baltfam.housing + baltfam.health + baltfam.grocery + baltfam.transit, t1: "", t2: "" }            
+        [
+            { section: "housing", x: 0, y: 0 },                          
+            { section: "health", x: 1, y: baltfam.housing },              
+            { section: "grocery", x: 2, y: baltfam.housing + baltfam.health },               
+            { section: "transit", x: 3, y: baltfam.housing + baltfam.health + baltfam.grocery },               
+            { section: "childcare", x: 4, y: baltfam.housing + baltfam.health + baltfam.grocery + baltfam.transit }   
         ],
-        [                                         // value being highlighted in each line
-          { x: 0, y: baltfam.housing, t1: "", t2: "" },  //
-          { x: 0, y: baltfam.health, t1: "", t2: "" },  //
-          { x: 0, y: baltfam.grocery, t1: "", t2: "" },  //
-          { x: 0, y: baltfam.transit, t1: "", t2: "" }, //
-          { x: 0, y: baltfam.childcare, t1: "", t2: "" }  //
+        [
+            { section: "housing", x: 0, y: baltfam.housing }, 
+            { section: "health", x: 1, y: baltfam.health }, 
+            { section: "grocery", x: 2, y: baltfam.grocery }, 
+            { section: "transit", x: 3, y: baltfam.transit },
+            { section: "childcare", x: 4, y: baltfam.childcare } 
         ],
-        [                                         // remainder after total spent 
-          { x: 0, y: baltfam.takehome - baltfam.housing, t1: "", t2: "" },
-          { x: 0, y: baltfam.takehome - baltfam.housing - baltfam.health, t1: "", t2: "" },
-          { x: 0, y: baltfam.takehome - baltfam.housing - baltfam.health - baltfam.grocery, t1: "", t2: "" },
-          { x: 0, y: baltfam.takehome - baltfam.housing - baltfam.health - baltfam.grocery - baltfam.transit, t1: "", t2: "" },
-          { x: 0, y: baltfam.takehome - baltfam.housing - baltfam.health - baltfam.grocery - baltfam.transit - baltfam.childcare, t1: "", t2: "" }
+        [
+            { section: "housing", x: 0, y: baltfam.takehome - baltfam.housing },
+            { section: "health", x: 1, y: baltfam.takehome - baltfam.housing - baltfam.health },
+            { section: "grocery", x: 2, y: baltfam.takehome - baltfam.housing - baltfam.health - baltfam.grocery },
+            { section: "transit", x: 3, y: baltfam.takehome - baltfam.housing - baltfam.health - baltfam.grocery - baltfam.transit },
+            { section: "childcare", x: 4, y: baltfam.takehome - baltfam.housing - baltfam.health - baltfam.grocery - baltfam.transit - baltfam.childcare }  
         ]
       ];
 
-      // stack that data
+
+
+
+
+
       var stack = d3.layout.stack();
       stack(dataneeds);
 
-      // set up scales 
       var xScale = d3.scale.ordinal()
         .domain(d3.range(dataneeds[0].length))
         .rangeRoundBands([0, w], 0.05);
-    
+
       var yScale = d3.scale.linear()
-        .domain([0,       
+        .domain([0,
           d3.max(dataneeds, function(d) {
             return d3.max(d, function(d) {
               return d.y0 + d.y;
@@ -369,84 +375,36 @@
         ])
         .range([0, h]);
 
-      // create SVG element
+
       var svg = d3.select("#graph-needs")
-            .append("svg")
-            .attr("width", h)         // note: these are reversed! that is ok for now.
-            .attr("height", w+1200);   // +1200 fudge, this is full height of needs graph
-  
-      // add a group for each row of data
+        .append("svg")
+        .attr("width", w)
+        .attr("height", h);
+
       var groups = svg.selectAll("g")
         .data(dataneeds)
-        .enter()
-        .append("g")
-        .attr("x", function(d) { return d.x + 100; }) // +100 for mysterious left offset again
-        .style("fill", function(d, i) {                   
+        .enter().append("g")
+        .style("fill", function(d, i) {                   // replace this with actual color function at some point
           var fillColor;                                  
-            if (i == 0) { fillColor = "#f8bc50";}      
-            else if (i == 1) { fillColor = "#c66728";}    
-            else if (i == 2) { fillColor = "#ab4949";}    
+            if (i == 0) { fillColor = "#f8bc50";}         // yellow
+            else if (i == 1) { fillColor = "#c66728";}    // orange
+            else if (i == 2) { fillColor = "#ab4949";}    // red
           return fillColor;      
         });
-        svg.selectAll('g').attr("transform","rotate(270 0,100)"); // rotate the whole shit lol
-        // in the rotation, note 3rd parameter. this needs to be same as w (actual height) currently 100
-  
-      // add a rect for each data value
+
       var rects = groups.selectAll("rect")
-        .data(function(d) { return d; })
+        .data(function(d) {return d;})
         .enter().append("rect")
-          .attr("x", -120) // -120 is to shift chart down to make way for annotation
-          .attr("y", function(d) { return yScale(d.y0)+100; }) // +100 is to kill mysterious left offset
-          .attr("height", function(d) { return yScale(d.y); })
-          .attr("width", xScale.rangeBand());
-
-      // draw a line over the start of every rect
-      var lines = groups.selectAll("line")
-        .data(function(d) { return d; })
-        .enter().append("line")
-        .attr("x1", -120) // shift lines to bottom to match rects
-        .attr("x2", 200) // line is 320 px long, see?
-        .attr("y1", function(d) { return yScale(d.y0)+100; }) // +100 for mysterious left offset again
-        .attr("y2", function(d) { return yScale(d.y0)+100; })        
-        .style("stroke-width", 4)
-        .style("stroke", "white")
-        .style("fill", "none");
-
-      // add the last line at the end of the graph
-      var lastLine = svg.append("line") // interestingly, this line is oriented normally, hence y is actually y here, x is x etc.
-        .attr("y1", 0) 
-        .attr("y2", 320) 
-        .attr("x1", 1168) // this number is bullshit, needs to pull from width of svg - 2 for offset
-        .attr("x2", 1168) 
-        .style("stroke-width", 4)
-        .style("stroke", "white")
-        .style("fill", "none");
-
-      // fix the position of the first line of the graph
-      var lineFix = svg.selectAll('line'); // shift that first line 2px so it doesn't fall off the left side
-      lineFix.first()
-        .attr('transform', 'translate(0,2)');
-
-      // add label line 1
-      var textLabelOne = svg.selectAll() // need to separate bold and reg trext via tspans
-        .data(dataneeds)
-        .enter().append("text")
-        .attr("class", "graph-label")
-        .style("font-weight", 700)
-        .attr("fill", "#231f20")
-        .attr("dx", function(d) { return yScale(d[0].y0)+10; })  // position horizontally
-        .attr("dy", "60")                                       // shift down from top of svg
-        .text(function(d) { return d[0].t1 + "% " + d[0].t2; });
-
-      // add label line 2
-      var textLabelTwo = svg.selectAll()
-        .data(dataneeds)
-        .enter().append("text")
-        .attr("class", "graph-label")
-        .attr("fill", "#231f20")
-        .attr("dx", function(d) { return yScale(d[0].y0)+10; })  // position horizontally
-        .attr("dy", "100")                                       // shift down from top of svg
-        .text(function(d) { return "$" + d[0].y; });
+        .attr("x", function(d, i) {
+          return xScale(i);
+        })
+        .attr("y", function(d) {
+          return yScale(d.y0);
+        })
+        .attr("height", function(d) {
+          return yScale(d.y);
+        })
+        .attr("width", xScale.rangeBand());
 
 
 
@@ -454,17 +412,7 @@
 
 
 
-
-
-
-
-
-
-
-
-
-
-    // draw actual budget graph
+// draw actual budget graph
 
       // array of arrays to feed d3 stack layout
       var dataactual = [
