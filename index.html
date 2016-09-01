@@ -324,86 +324,6 @@
 
 
 
-// draw needs graphs
-
-
-
-
-      var dataneeds = [
-        [
-            { section: "housing", x: 0, y: 0 },                          
-            { section: "health", x: 1, y: baltfam.housing },              
-            { section: "grocery", x: 2, y: baltfam.housing + baltfam.health },               
-            { section: "transit", x: 3, y: baltfam.housing + baltfam.health + baltfam.grocery },               
-            { section: "childcare", x: 4, y: baltfam.housing + baltfam.health + baltfam.grocery + baltfam.transit }   
-        ],
-        [
-            { section: "housing", x: 0, y: baltfam.housing }, 
-            { section: "health", x: 1, y: baltfam.health }, 
-            { section: "grocery", x: 2, y: baltfam.grocery }, 
-            { section: "transit", x: 3, y: baltfam.transit },
-            { section: "childcare", x: 4, y: baltfam.childcare } 
-        ],
-        [
-            { section: "housing", x: 0, y: baltfam.takehome - baltfam.housing },
-            { section: "health", x: 1, y: baltfam.takehome - baltfam.housing - baltfam.health },
-            { section: "grocery", x: 2, y: baltfam.takehome - baltfam.housing - baltfam.health - baltfam.grocery },
-            { section: "transit", x: 3, y: baltfam.takehome - baltfam.housing - baltfam.health - baltfam.grocery - baltfam.transit },
-            { section: "childcare", x: 4, y: baltfam.takehome - baltfam.housing - baltfam.health - baltfam.grocery - baltfam.transit - baltfam.childcare }  
-        ]
-      ];
-
-
-      var stack = d3.layout.stack();
-      stack(dataneeds);
-
-      var xScale = d3.scale.ordinal()
-        .domain(d3.range(dataneeds[0].length))
-        .rangeRoundBands([0, h], 0.05); // This is actually the Y scale
-
-      var yScale = d3.scale.linear()
-        .domain([0,
-          d3.max(dataneeds, function(d) {
-            return d3.max(d, function(d) {
-              return d.y0 + d.y;
-            });
-          })
-        ])
-        .range([0, w]); // This is actually the X Scale
-
-
-      var svg = d3.select("#graph-needs")
-        .append("svg")
-        .attr("width", w)
-        .attr("height", h);
-
-      var groups = svg.selectAll("g")
-        .data(dataneeds)
-        .enter().append("g")
-        .style("fill", function(d, i) {                   // replace this with actual color function at some point
-          var fillColor;                                  
-            if (i == 0) { fillColor = "#f8bc50";}         // yellow
-            else if (i == 1) { fillColor = "#c66728";}    // orange
-            else if (i == 2) { fillColor = "#ab4949";}    // red
-          return fillColor;      
-        });
-
-
-      var rects = groups.selectAll("rect")
-        .data(function(d) {return d;})
-        .enter().append("rect")
-        .attr("y", function(d, i) {
-          return xScale(i);
-        })
-        .attr("x", function(d) {
-          return yScale(d.y0);
-        })
-        .attr("width", function(d) {
-          return yScale(d.y);
-        })
-        .attr("height", xScale.rangeBand());
-
-
 
 
 
@@ -524,6 +444,110 @@
 
 
 
+
+
+// draw needs graphs
+
+
+      var w = 1170;
+      var h = 225; 
+
+      var dataneeds = [
+        [
+            { section: "housing", x: 0, y: 0 },                          
+            { section: "health", x: 1, y: baltfam.housing },              
+            { section: "grocery", x: 2, y: baltfam.housing + baltfam.health },               
+            { section: "transit", x: 3, y: baltfam.housing + baltfam.health + baltfam.grocery },               
+            { section: "childcare", x: 4, y: baltfam.housing + baltfam.health + baltfam.grocery + baltfam.transit }   
+        ],
+        [
+            { section: "housing", x: 0, y: baltfam.housing }, 
+            { section: "health", x: 1, y: baltfam.health }, 
+            { section: "grocery", x: 2, y: baltfam.grocery }, 
+            { section: "transit", x: 3, y: baltfam.transit },
+            { section: "childcare", x: 4, y: baltfam.childcare } 
+        ],
+        [
+            { section: "housing", x: 0, y: baltfam.takehome - baltfam.housing },
+            { section: "health", x: 1, y: baltfam.takehome - baltfam.housing - baltfam.health },
+            { section: "grocery", x: 2, y: baltfam.takehome - baltfam.housing - baltfam.health - baltfam.grocery },
+            { section: "transit", x: 3, y: baltfam.takehome - baltfam.housing - baltfam.health - baltfam.grocery - baltfam.transit },
+            { section: "childcare", x: 4, y: baltfam.takehome - baltfam.housing - baltfam.health - baltfam.grocery - baltfam.transit - baltfam.childcare }  
+        ]
+      ];
+
+
+      
+
+      var stack = d3.layout.stack();
+      stack(dataneeds);
+
+      var xScale = d3.scale.ordinal()
+        .domain(d3.range(dataneeds[0].length))
+        .rangeRoundBands([0, h], 0.05); 
+        // This is actually the Y scale
+
+      var yScale = d3.scale.linear()
+        .domain([0,
+          d3.max(dataneeds, function(d) {
+            return d3.max(d, function(d) {
+              return d.y0 + d.y;
+            });
+          })
+        ])
+        .range([0, w]); 
+        // This is actually the X Scale
+
+
+      var svg = d3.select("#graph-needs")
+        .append("svg")
+        .attr("width", w)
+        .attr("height", h);
+
+      var groups = svg.selectAll("g")
+        .data(dataneeds)
+        .enter().append("g")
+        .style("fill", function(d, i) {                   // TODO: replace this with actual color function at some point
+          var fillColor;                                  
+            if (i == 0) { fillColor = "#f8bc50";}         // yellow
+            else if (i == 1) { fillColor = "#c66728";}    // orange
+            else if (i == 2) { fillColor = "#ab4949";}    // red
+          return fillColor;      
+        });
+
+
+      var rects = groups.selectAll("rect")
+        .data(function(d) {return d;})
+        .enter().append("rect")
+        .attr("y", function(d, i) {
+          return xScale(i);
+        })
+        .attr("x", function(d) {
+          return yScale(d.y0);
+        })
+        .attr("width", function(d) {
+          return yScale(d.y);
+        })
+        .attr("height", xScale.rangeBand());
+
+
+        // still to do:
+        //  fix vertical spacing
+        //  add labels and icons above chart
+        //  add dashed lines and icons below chart
+        //  fix colors
+        //  draw gradient background
+
+
+
+
+
+
+
+
+
+
+
     </script>
 
 
@@ -531,7 +555,10 @@
 <!-- 
 
       still to do: 
-        draw basic graphs
+        convert ideal and actual drawings to correct horz layout approach
+        fix labeling layout on actual budget
+        add dashed lines to labeling layout
+        pull overall width from grid container
         map all text numbers to data points - jquery
         styling pass / convert to sass?
         object type, data input (csv?) and city / household selection
