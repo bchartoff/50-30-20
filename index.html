@@ -71,7 +71,9 @@
       .right {float:right;}
       .clear {clear:both;}
 
-      div#graph-needs svg {background: linear-gradient(to right, rgba(258,188,80,0.2), rgba(171,73,73,0.2));}
+      div#graph-needs svg {
+        background: linear-gradient(to right, rgba(258,188,80,0.2), rgba(171,73,73,0.2));
+        margin-bottom: 60px;}
 
 
     </style>
@@ -454,43 +456,40 @@
 
 
       var w = 1170;
-      var h = 800; 
+      var h = 600; 
 
       var dataneeds = [
         [
-            { section: "housing", x: 0, y: 0 },                          
-            { section: "health", x: 1, y: baltfam.housing },              
-            { section: "grocery", x: 2, y: baltfam.housing + baltfam.health },               
-            { section: "transit", x: 3, y: baltfam.housing + baltfam.health + baltfam.grocery },               
-            { section: "childcare", x: 4, y: baltfam.housing + baltfam.health + baltfam.grocery + baltfam.transit }   
+            { section: "Housing & Utilities", x: 0, y: 0 },                          
+            { section: "Healthcare", x: 1, y: baltfam.housing },              
+            { section: "Groceries", x: 2, y: baltfam.housing + baltfam.health },               
+            { section: "Transportation", x: 3, y: baltfam.housing + baltfam.health + baltfam.grocery },               
+            { section: "Childcare", x: 4, y: baltfam.housing + baltfam.health + baltfam.grocery + baltfam.transit }   
         ],
         [
-            { section: "housing", x: 0, y: baltfam.housing }, 
-            { section: "health", x: 1, y: baltfam.health }, 
-            { section: "grocery", x: 2, y: baltfam.grocery }, 
-            { section: "transit", x: 3, y: baltfam.transit },
-            { section: "childcare", x: 4, y: baltfam.childcare } 
+            { section: "Housing & Utilities", x: 0, y: baltfam.housing }, 
+            { section: "Healthcare", x: 1, y: baltfam.health }, 
+            { section: "Groceries", x: 2, y: baltfam.grocery }, 
+            { section: "Transportation", x: 3, y: baltfam.transit },
+            { section: "Childcare", x: 4, y: baltfam.childcare } 
         ],
         [
-            { section: "housing", x: 0, y: baltfam.takehome - baltfam.housing },
-            { section: "health", x: 1, y: baltfam.takehome - baltfam.housing - baltfam.health },
-            { section: "grocery", x: 2, y: baltfam.takehome - baltfam.housing - baltfam.health - baltfam.grocery },
-            { section: "transit", x: 3, y: baltfam.takehome - baltfam.housing - baltfam.health - baltfam.grocery - baltfam.transit },
-            { section: "childcare", x: 4, y: baltfam.takehome - baltfam.housing - baltfam.health - baltfam.grocery - baltfam.transit - baltfam.childcare }  
+            { section: "Housing & Utilities", x: 0, y: baltfam.takehome - baltfam.housing },
+            { section: "Healthcare", x: 1, y: baltfam.takehome - baltfam.housing - baltfam.health },
+            { section: "Groceries", x: 2, y: baltfam.takehome - baltfam.housing - baltfam.health - baltfam.grocery },
+            { section: "Transportation", x: 3, y: baltfam.takehome - baltfam.housing - baltfam.health - baltfam.grocery - baltfam.transit },
+            { section: "Childcare", x: 4, y: baltfam.takehome - baltfam.housing - baltfam.health - baltfam.grocery - baltfam.transit - baltfam.childcare }  
         ]
       ];
-
-
-      
 
       var stack = d3.layout.stack();
       stack(dataneeds);
 
-      var xScale = d3.scale.ordinal()              // This is actually the Y scale
+      var xScale = d3.scale.ordinal()              // Bostock note: this is actually the Y scale
         .domain(d3.range(dataneeds[0].length))
         .rangeRoundBands([0, h]); 
 
-      var yScale = d3.scale.linear()               // This is actually the X Scale
+      var yScale = d3.scale.linear()               // Bostock note: this is actually the X Scale
         .domain([0,
           d3.max(dataneeds, function(d) {
             return d3.max(d, function(d) {
@@ -508,7 +507,7 @@
       var groups = svg.selectAll("g")
         .data(dataneeds)
         .enter().append("g")
-        .style("fill", function(d, i) {                   // TODO: replace this with actual color function at some point
+        .style("fill", function(d, i) {                   
           var fillColor;                                  
             if (i == 0) { fillColor = "#f8bc50";}         // solid yellow
             else if (i == 1) { fillColor = "#f7cf8f";}    // light yellow -- this should be pattern fill    
@@ -520,15 +519,20 @@
         .data(function(d) {return d;})
         .enter().append("rect")
         .attr("y", function(d, i) {
-          return xScale(i)+20; // add value to this to push the whole graph down together
-        })
-        .attr("x", function(d) {
-          return yScale(d.y0); // ignore this
-        })
-        .attr("width", function(d) {
-          return yScale(d.y); // ignore this
-        })
-        .attr("height", 60); // this controls width of bars, no effect on position
+          return xScale(i)+40; })                               // add value to this to push the whole graph down together
+        .attr("x", function(d) { return yScale(d.y0); })
+        .attr("width", function(d) { return yScale(d.y); })
+        .attr("height", 60);                                    // sets height of each bar, no effect on position
+
+      var text = groups.selectAll("text")
+        .data(function(d) {return d;})
+        .enter().append("text")
+        .attr("y", function(d, i) { return xScale(i)+32; })  // value adjusts vertical position of labels
+        .attr("x", function(d) { return d.y0; })
+        .attr("fill", "black")
+        .text(function(d) { return d.section; });
+
+
 
 
         // still to do:
@@ -536,6 +540,7 @@
         //  add labels and icons above chart
         //  add dashed lines and icons below chart
         //  add dashed line fill / mask -- css?
+        //  maybe fix background colors into sections?
 
 
 
