@@ -460,11 +460,11 @@
 
       var dataneeds = [
         [
-            { section: "Housing & Utilities", x: 0, y: 0 },                          
-            { section: "Healthcare", x: 1, y: baltfam.housing },              
-            { section: "Groceries", x: 2, y: baltfam.housing + baltfam.health },               
-            { section: "Transportation", x: 3, y: baltfam.housing + baltfam.health + baltfam.grocery },               
-            { section: "Childcare", x: 4, y: baltfam.housing + baltfam.health + baltfam.grocery + baltfam.transit }   
+            { x: 0, y: 0 },                          
+            { x: 1, y: baltfam.housing },              
+            { x: 2, y: baltfam.housing + baltfam.health },               
+            { x: 3, y: baltfam.housing + baltfam.health + baltfam.grocery },               
+            { x: 4, y: baltfam.housing + baltfam.health + baltfam.grocery + baltfam.transit }   
         ],
         [
             { section: "Housing & Utilities", x: 0, y: baltfam.housing }, 
@@ -474,11 +474,11 @@
             { section: "Childcare", x: 4, y: baltfam.childcare } 
         ],
         [
-            { section: "Housing & Utilities", x: 0, y: baltfam.takehome - baltfam.housing },
-            { section: "Healthcare", x: 1, y: baltfam.takehome - baltfam.housing - baltfam.health },
-            { section: "Groceries", x: 2, y: baltfam.takehome - baltfam.housing - baltfam.health - baltfam.grocery },
-            { section: "Transportation", x: 3, y: baltfam.takehome - baltfam.housing - baltfam.health - baltfam.grocery - baltfam.transit },
-            { section: "Childcare", x: 4, y: baltfam.takehome - baltfam.housing - baltfam.health - baltfam.grocery - baltfam.transit - baltfam.childcare }  
+            { x: 0, y: baltfam.takehome - baltfam.housing },
+            { x: 1, y: baltfam.takehome - baltfam.housing - baltfam.health },
+            { x: 2, y: baltfam.takehome - baltfam.housing - baltfam.health - baltfam.grocery },
+            { x: 3, y: baltfam.takehome - baltfam.housing - baltfam.health - baltfam.grocery - baltfam.transit },
+            { x: 4, y: baltfam.takehome - baltfam.housing - baltfam.health - baltfam.grocery - baltfam.transit - baltfam.childcare }  
         ]
       ];
 
@@ -528,7 +528,7 @@
         .data(function(d) {return d;})
         .enter().append("text")
         .attr("y", function(d, i) { return xScale(i)+32; })  // value adjusts vertical position of labels
-        .attr("x", function(d) { return d.y0; })
+        .attr("x", function(d) { return yScale(d.y0); })
         .attr("fill", "black")
         .text(function(d) { return d.section; });
 
