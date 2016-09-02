@@ -71,12 +71,16 @@
       .right {float:right;}
       .clear {clear:both;}
 
+      div#graph-needs svg {background: linear-gradient(to right, rgba(258,188,80,0.2), rgba(171,73,73,0.2));}
+
 
     </style>
 
 
   </head>
   <body>
+
+
 
     <div class="row scenario">
       <div class="row">
@@ -450,7 +454,7 @@
 
 
       var w = 1170;
-      var h = 225; 
+      var h = 800; 
 
       var dataneeds = [
         [
@@ -482,12 +486,11 @@
       var stack = d3.layout.stack();
       stack(dataneeds);
 
-      var xScale = d3.scale.ordinal()
+      var xScale = d3.scale.ordinal()              // This is actually the Y scale
         .domain(d3.range(dataneeds[0].length))
-        .rangeRoundBands([0, h], 0.05); 
-        // This is actually the Y scale
+        .rangeRoundBands([0, h]); 
 
-      var yScale = d3.scale.linear()
+      var yScale = d3.scale.linear()               // This is actually the X Scale
         .domain([0,
           d3.max(dataneeds, function(d) {
             return d3.max(d, function(d) {
@@ -496,8 +499,6 @@
           })
         ])
         .range([0, w]); 
-        // This is actually the X Scale
-
 
       var svg = d3.select("#graph-needs")
         .append("svg")
@@ -509,34 +510,32 @@
         .enter().append("g")
         .style("fill", function(d, i) {                   // TODO: replace this with actual color function at some point
           var fillColor;                                  
-            if (i == 0) { fillColor = "#f8bc50";}         // yellow
-            else if (i == 1) { fillColor = "#c66728";}    // orange
-            else if (i == 2) { fillColor = "#ab4949";}    // red
+            if (i == 0) { fillColor = "#f8bc50";}         // solid yellow
+            else if (i == 1) { fillColor = "#f7cf8f";}    // light yellow -- this should be pattern fill    
+            else if (i == 2) { fillColor = "#e8e8e8";}    // gray
           return fillColor;      
         });
-
 
       var rects = groups.selectAll("rect")
         .data(function(d) {return d;})
         .enter().append("rect")
         .attr("y", function(d, i) {
-          return xScale(i);
+          return xScale(i)+20; // add value to this to push the whole graph down together
         })
         .attr("x", function(d) {
-          return yScale(d.y0);
+          return yScale(d.y0); // ignore this
         })
         .attr("width", function(d) {
-          return yScale(d.y);
+          return yScale(d.y); // ignore this
         })
-        .attr("height", xScale.rangeBand());
+        .attr("height", 60); // this controls width of bars, no effect on position
 
 
         // still to do:
         //  fix vertical spacing
         //  add labels and icons above chart
         //  add dashed lines and icons below chart
-        //  fix colors
-        //  draw gradient background
+        //  add dashed line fill / mask -- css?
 
 
 
