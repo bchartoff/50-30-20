@@ -527,13 +527,24 @@
       var text = groups.selectAll("text")
         .data(function(d) {return d;})
         .enter().append("text")
-        .attr("y", function(d, i) { return xScale(i)+32; })  // value adjusts vertical position of labels
+        .attr("y", function(d, i) { return xScale(i)+32; })     // value adjusts vertical position of labels
         .attr("x", function(d) { return yScale(d.y0); })
-        .attr("fill", "black")
-        .text(function(d) { return d.section; });
+        .attr("fill", "#231f20")
+        .text(function(d) { 
+          if (d.section != null) { return d.section + " $" + d.y; }
+          else { return null; }
+        });
 
 
 
+
+/*          for (var n = 0; n < dataneeds.length; n++) {
+            if (n=1)
+              { r}
+            else
+              { return null }
+          });
+*/
 
         // still to do:
         //  fix vertical spacing
