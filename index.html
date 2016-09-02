@@ -528,12 +528,47 @@
         .data(function(d) {return d;})
         .enter().append("text")
         .attr("y", function(d, i) { return xScale(i)+32; })     // value adjusts vertical position of labels
-        .attr("x", function(d) { return yScale(d.y0); })
+        .attr("x", function(d) { return yScale(d.y0)+6; })     // value adjusts horizontal position of labels
         .attr("fill", "#231f20")
         .text(function(d) { 
           if (d.section != null) { return d.section + " $" + d.y; }
           else { return null; }
         });
+
+      // first dashed line
+      var baseLine = svg.append("line")
+        .attr("y1", 0) 
+        .attr("y2", h) 
+        .attr("x1", 2) 
+        .attr("x2", 2) 
+        .style("stroke-width", 4)
+        .style("stroke", "white")
+        .style("fill", "none")
+        .style("stroke-dasharray", ("6, 6"));
+
+      // second dashed line
+      var baseLine = svg.append("line")
+        .attr("y1", 0) 
+        .attr("y2", h) 
+        .attr("x1", function(d) { return yScale(baltfam.fifty); })
+        .attr("x2", function(d) { return yScale(baltfam.fifty); })
+        .style("stroke-width", 4)
+        .style("stroke", "white")
+        .style("fill", "none")
+        .style("stroke-dasharray", ("6, 6"));
+
+      // third dashed line
+      var baseLine = svg.append("line")
+        .attr("y1", 0) 
+        .attr("y2", h) 
+        .attr("x1", w-2)
+        .attr("x2", w-2)
+        .style("stroke-width", 4)
+        .style("stroke", "white")
+        .style("fill", "none")
+        .style("stroke-dasharray", ("6, 6"));
+
+
 
 
 
