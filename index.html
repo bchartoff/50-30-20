@@ -537,36 +537,48 @@
 
       // first dashed line
       var baseLine = svg.append("line")
-        .attr("y1", 0) 
-        .attr("y2", h) 
+        .attr("y1", h) 
+        .attr("y2", 0) 
         .attr("x1", 2) 
         .attr("x2", 2) 
         .style("stroke-width", 4)
         .style("stroke", "white")
         .style("fill", "none")
-        .style("stroke-dasharray", ("6, 6"));
+        .style("stroke-dasharray", ("4, 8"));
 
       // second dashed line
       var baseLine = svg.append("line")
-        .attr("y1", 0) 
-        .attr("y2", h) 
+        .attr("y1", h) 
+        .attr("y2", 0) 
         .attr("x1", function(d) { return yScale(baltfam.fifty); })
         .attr("x2", function(d) { return yScale(baltfam.fifty); })
         .style("stroke-width", 4)
         .style("stroke", "white")
         .style("fill", "none")
-        .style("stroke-dasharray", ("6, 6"));
+        .style("stroke-dasharray", ("4, 8"));
 
-      // third dashed line
+      // second dashed line
       var baseLine = svg.append("line")
-        .attr("y1", 0) 
-        .attr("y2", h) 
+        .attr("y1", h) 
+        .attr("y2", 0) 
+        .attr("x1", function(d) { return yScale(baltfam.fifty) + yScale(baltfam.thirty); })
+        .attr("x2", function(d) { return yScale(baltfam.fifty) + yScale(baltfam.thirty); })
+        .style("stroke-width", 4)
+        .style("stroke", "white")
+        .style("fill", "none")
+        .style("stroke-dasharray", ("4, 8"));
+
+
+      // fourth dashed line
+      var baseLine = svg.append("line")
+        .attr("y1", h) 
+        .attr("y2", 0) 
         .attr("x1", w-2)
         .attr("x2", w-2)
         .style("stroke-width", 4)
         .style("stroke", "white")
         .style("fill", "none")
-        .style("stroke-dasharray", ("6, 6"));
+        .style("stroke-dasharray", ("4, 8"));
 
 
 
