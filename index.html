@@ -54,7 +54,7 @@
         color: #231f20;}
 
       h1 {font-weight:400; font-size:4.0em;}
-      h2 {font-weight:300; font-size:3.2em;}
+      h2 {font-weight:300; font-size:3.2em; margin-top:16px;}
       h3 {font-weight:700; font-size:1.2em;}
       p, li {font-weight:400; font-size:1em;}
 
@@ -71,9 +71,11 @@
       .right {float:right;}
       .clear {clear:both;}
 
+
+      svg {margin-bottom: 40px;}
+
       div#graph-needs svg {
-        background: linear-gradient(to right, rgba(258,188,80,0.2), rgba(171,73,73,0.2));
-        margin-bottom: 60px;}
+        background: linear-gradient(to right, rgba(258,188,80,0.2), rgba(171,73,73,0.2));}
 
 
     </style>
@@ -156,7 +158,7 @@
 
     <script type="text/javascript">
 
-// setup stuff
+// setup 
 
     // static js object to store balitmore family data
     var baltfam = new Object();
@@ -193,23 +195,16 @@
         return d3.select(this[0][last]);
       };
 
-      // width and height for all 3 graphs (reversed yay :\ )
-      var w = 100;
-      var h = 1170; // HEY YOU pull this from the container, not this magic number
-
-
-
-
-
-
-
-
-
 
 
 
 
 // draw ideal budget graph
+
+
+
+      var w = 1170;
+      var h = 100; // TODO: pull this from the container, not this magic number
 
       // array of arrays to feed d3 stack layout
       var dataideal = [
@@ -231,7 +226,7 @@
       // set up scales 
       var xScale = d3.scale.ordinal()
         .domain(d3.range(dataideal[0].length))
-        .rangeRoundBands([0, w], 0.05);
+        .rangeRoundBands([0, h], 0.05);
     
       var yScale = d3.scale.linear()
         .domain([0,       
@@ -241,13 +236,13 @@
             });
           })
         ])
-        .range([0, h]);
+        .range([0, w]);
 
       // create SVG element
       var svg = d3.select("#graph-ideal")
             .append("svg")
-            .attr("width", h)         // note: these are reversed! that is ok for now.
-            .attr("height", w+120);   // +120 is to open up vertical space for annotation
+            .attr("width", w)         // note: these are reversed! that is ok for now.
+            .attr("height", h+120);   // +120 is to open up vertical space for annotation
   
       // add a group for each row of data
       var groups = svg.selectAll("g")
@@ -261,26 +256,24 @@
             else if (i == 2) { fillColor = "#ab4949";}    // red
           return fillColor;      
         });
-        svg.selectAll('g').attr("transform","rotate(270 0,100)"); // rotate the whole shit lol
-        // in the rotation, note 3rd parameter. this needs to be same as w (actual height) currently 100
   
       // add a rect for each data value
       var rects = groups.selectAll("rect")
         .data(function(d) { return d; })
         .enter().append("rect")
-          .attr("x", -120) // -120 is to shift chart down to make way for annotation
-          .attr("y", function(d) { return yScale(d.y0)+100; }) // +100 is to kill mysterious left offset
-          .attr("height", function(d) { return yScale(d.y); })
-          .attr("width", xScale.rangeBand());
+          .attr("x", function(d) { return yScale(d.y0); }) 
+          .attr("y", 128) // 128 is to shift chart down to make way for annotation
+          .attr("width", function(d) { return yScale(d.y); })
+          .attr("height", xScale.rangeBand());
 
       // draw a line over the start of every rect
       var lines = groups.selectAll("line")
         .data(function(d) { return d; })
         .enter().append("line")
-        .attr("x1", -120) // shift lines to bottom to match rects
-        .attr("x2", 200) // line is 320 px long, see?
-        .attr("y1", function(d) { return yScale(d.y0)+100; }) // +100 for mysterious left offset again
-        .attr("y2", function(d) { return yScale(d.y0)+100; })        
+        .attr("y1", 0) 
+        .attr("y2", 220) 
+        .attr("x1", function(d) { return yScale(d.y0); }) 
+        .attr("x2", function(d) { return yScale(d.y0); })        
         .style("stroke-width", 4)
         .style("stroke", "white")
         .style("fill", "none");
@@ -288,7 +281,7 @@
       // add the last line at the end of the graph
       var lastLine = svg.append("line") // interestingly, this line is oriented normally, hence y is actually y here, x is x etc.
         .attr("y1", 0) 
-        .attr("y2", 320) 
+        .attr("y2", 220) 
         .attr("x1", 1168) // this number is bullshit, needs to pull from width of svg - 2 for offset
         .attr("x2", 1168) 
         .style("stroke-width", 4)
@@ -298,7 +291,7 @@
       // fix the position of the first line of the graph
       var lineFix = svg.selectAll('line'); // shift that first line 2px so it doesn't fall off the left side
       lineFix.first()
-        .attr('transform', 'translate(0,2)');
+        .attr('transform', 'translate(2,0)');
 
       // add label line 1
       var textLabelOne = svg.selectAll() // need to separate bold and reg trext via tspans
@@ -326,16 +319,12 @@
 
 
 
-
-
-
-
-
-
-
-
-
 // draw actual budget graph
+
+
+      var w = 1170;
+      var h = 100; // TODO: pull this from the container, not this magic number -- also refactor away from individual graphs
+
 
       // array of arrays to feed d3 stack layout
       var dataactual = [
@@ -357,7 +346,7 @@
       // set up scales 
       var xScale = d3.scale.ordinal()
         .domain(d3.range(dataactual[0].length))
-        .rangeRoundBands([0, w], 0.05);
+        .rangeRoundBands([0, h], 0.05);
     
       var yScale = d3.scale.linear()
         .domain([0,       
@@ -367,19 +356,18 @@
             });
           })
         ])
-        .range([0, h]);
+        .range([0, w]);
 
       // create SVG element
       var svg = d3.select("#graph-actual")
             .append("svg")
-            .attr("width", h)         // note: these are reversed! that is ok for now.
-            .attr("height", w+120);   // +120 is to open up vertical space for annotation
+            .attr("width", w)         // note: these are reversed! that is ok for now.
+            .attr("height", h+120);   // +120 is to open up vertical space for annotation
   
       // add a group for each row of data
       var groups = svg.selectAll("g")
         .data(dataactual)
-        .enter()
-        .append("g")
+        .enter().append("g")
         .style("fill", function(d, i) {                   // replace this with actual color function at some point
           var fillColor;                                  
             if (i == 0) { fillColor = "#f8bc50";}         // yellow
@@ -387,26 +375,24 @@
             else if (i == 2) { fillColor = "#ab4949";}    // red
           return fillColor;      
         });
-        svg.selectAll('g').attr("transform","rotate(270 0,100)"); // rotate the whole shit lol
-        // in the rotation, note 3rd parameter. this needs to be same as w (actual height) currently 100
   
       // add a rect for each data value
       var rects = groups.selectAll("rect")
         .data(function(d) { return d; })
         .enter().append("rect")
-          .attr("x", -120) // -120 is to shift chart down to make way for annotation
-          .attr("y", function(d) { return yScale(d.y0)+100; }) // +100 is to kill mysterious left offset
-          .attr("height", function(d) { return yScale(d.y); })
-          .attr("width", xScale.rangeBand());
+          .attr("x", function(d) { return yScale(d.y0); })
+          .attr("y", 128)               // 128 is to shift chart down to make way for annotation
+          .attr("width", function(d) { return yScale(d.y); })
+          .attr("height", xScale.rangeBand());
 
       // draw a line over the start of every rect
       var lines = groups.selectAll("line")
         .data(function(d) { return d; })
         .enter().append("line")
-        .attr("x1", -120) // shift lines to bottom to match rects
-        .attr("x2", -30) // line is 320 px long, see?
-        .attr("y1", function(d) { return yScale(d.y0)+100; }) // +100 for mysterious left offset again
-        .attr("y2", function(d) { return yScale(d.y0)+100; })        
+        .attr("x1", function(d) { return yScale(d.y0); }) 
+        .attr("x2", function(d) { return yScale(d.y0); })        
+        .attr("y1", 218)
+        .attr("y2", 128) 
         .style("stroke-width", 4)
         .style("stroke", "white")
         .style("fill", "none");
@@ -424,11 +410,11 @@
       // fix the position of the first line of the graph
       var lineFix = svg.selectAll('line'); // shift that first line 2px so it doesn't fall off the left side
       lineFix.first()
-        .attr('transform', 'translate(0,2)');
+        .attr('transform', 'translate(2,0)');
 
       // add dashed lines
       var baseLine = svg.append("line")
-        .attr("y1", w*3) 
+        .attr("y1", h*3) 
         .attr("y2", 80) 
         .attr("x1", 2) 
         .attr("x2", 2) 
@@ -439,7 +425,7 @@
 
       // second dashed line
       var baseLine = svg.append("line")
-        .attr("y1", w*3) 
+        .attr("y1", h*3) 
         .attr("y2", 80) 
         .attr("x1", function(d) { return yScale(baltfam.fifty); })
         .attr("x2", function(d) { return yScale(baltfam.fifty); })
@@ -450,7 +436,7 @@
 
       // third dashed line
       var baseLine = svg.append("line")
-        .attr("y1", w*3) 
+        .attr("y1", h*3) 
         .attr("y2", 80) 
         .attr("x1", function(d) { return yScale(baltfam.fifty) + yScale(baltfam.thirty); })
         .attr("x2", function(d) { return yScale(baltfam.fifty) + yScale(baltfam.thirty); })
@@ -461,15 +447,14 @@
 
       // fourth dashed line
       var baseLine = svg.append("line")
-        .attr("y1", w*3) 
+        .attr("y1", h*3) 
         .attr("y2", 80) 
-        .attr("x1", h-2)
-        .attr("x2", h-2)
+        .attr("x1", w-2)
+        .attr("x2", w-2)
         .style("stroke-width", 4)
         .style("stroke", "white")
         .style("fill", "none")
         .style("stroke-dasharray", ("4, 8"));
-
 
       // add label line 1
       var textLabelOne = svg.selectAll() // need to separate bold and reg trext via tspans
@@ -491,6 +476,7 @@
         .attr("dx", function(d) { return yScale(d[0].y0)+10; })  // position horizontally
         .attr("dy", "100")                                       // shift down from top of svg
         .text(function(d) { return "$" + d[0].y; });
+
 
 
 
@@ -628,14 +614,6 @@
 
 
 
-
-/*          for (var n = 0; n < dataneeds.length; n++) {
-            if (n=1)
-              { r}
-            else
-              { return null }
-          });
-*/
 
         // still to do:
         //  fix vertical spacing
