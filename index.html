@@ -158,55 +158,33 @@
 
     <script type="text/javascript">
 
-// setup 
+      // static js object to store balitmore family data
+      // TODO: change this to generic object, pull city-specific data from csv as needed
+      var baltfam = new Object();
+        baltfam.city = "Baltimore, MD";
+        baltfam.household = "Family";
+        baltfam.income = 69402;
+        baltfam.takehome = 4577;
+        baltfam.housing = 1252;
+        baltfam.health = 628;
+        baltfam.grocery = 875;
+        baltfam.transit = 138;
+        baltfam.childcare = 1157;
+        baltfam.difference = baltfam.income - 23850;
+        baltfam.fifty = Math.round(baltfam.takehome * 0.5);
+        baltfam.thirty = Math.round(baltfam.takehome * 0.3);
+        baltfam.twenty = Math.round(baltfam.takehome * 0.2);
+        baltfam.needs = baltfam.housing + baltfam.health + baltfam.grocery + baltfam.transit + baltfam.childcare;
+        baltfam.lo = baltfam.takehome - baltfam.needs;
+        baltfam.lowants = Math.round(baltfam.lo * 0.6);
+        baltfam.losaves = Math.round(baltfam.lo * 0.4);
+        baltfam.needsperc = Math.round((baltfam.needs / baltfam.takehome)*100);
+        baltfam.wantsperc = Math.round((baltfam.lowants / baltfam.takehome)*100);
+        baltfam.savesperc = Math.round((baltfam.losaves / baltfam.takehome)*100);
+        baltfam.overneeds = Math.round(baltfam.needs - baltfam.fifty);
+        baltfam.overneedsperc = (Math.round((baltfam.needsperc - 0.5)*100))/100;
 
-    // static js object to store balitmore family data
-    var baltfam = new Object();
-      baltfam.city = "Baltimore, MD";
-      baltfam.household = "Family";
-      baltfam.income = 69402;
-      baltfam.takehome = 4577;
-      baltfam.housing = 1252;
-      baltfam.health = 628;
-      baltfam.grocery = 875;
-      baltfam.transit = 138;
-      baltfam.childcare = 1157;
-      baltfam.difference = baltfam.income - 23850;
-      baltfam.fifty = Math.round(baltfam.takehome * 0.5);
-      baltfam.thirty = Math.round(baltfam.takehome * 0.3);
-      baltfam.twenty = Math.round(baltfam.takehome * 0.2);
-      baltfam.needs = baltfam.housing + baltfam.health + baltfam.grocery + baltfam.transit + baltfam.childcare;
-      baltfam.lo = baltfam.takehome - baltfam.needs;
-      baltfam.lowants = Math.round(baltfam.lo * 0.6);
-      baltfam.losaves = Math.round(baltfam.lo * 0.4);
-      baltfam.needsperc = Math.round((baltfam.needs / baltfam.takehome)*100);
-      baltfam.wantsperc = Math.round((baltfam.lowants / baltfam.takehome)*100);
-      baltfam.savesperc = Math.round((baltfam.losaves / baltfam.takehome)*100);
-      baltfam.overneeds = Math.round(baltfam.needs - baltfam.fifty);
-      baltfam.overneedsperc = (Math.round((baltfam.needsperc - 0.5)*100))/100;
-
-     // select first or last in a series
-      d3.selection.prototype.first = function() {
-        return d3.select(this[0][0]);
-      };
-
-      d3.selection.prototype.last = function() {
-        var last = this.size() - 1;
-        return d3.select(this[0][last]);
-      };
-
-
-
-
-
-// draw ideal budget graph
-
-
-
-      var w = 1170;
-      var h = 100; // TODO: pull this from the container, not this magic number
-
-      // array of arrays to feed d3 stack layout
+      // setup data arrays for each graph
       var dataideal = [
         [
           { x: 0, y: baltfam.fifty, t1: "50%", t2: "Needs:" }
@@ -218,276 +196,6 @@
           { x: 0, y: baltfam.twenty, t1: "20%", t2: "Saves:"  }
         ]
       ];
-
-      // stack that data
-      var stack = d3.layout.stack();
-      stack(dataideal);
-
-      // set up scales 
-      var xScale = d3.scale.ordinal()
-        .domain(d3.range(dataideal[0].length))
-        .rangeRoundBands([0, h], 0.05);
-    
-      var yScale = d3.scale.linear()
-        .domain([0,       
-          d3.max(dataideal, function(d) {
-            return d3.max(d, function(d) {
-              return d.y0 + d.y;
-            });
-          })
-        ])
-        .range([0, w]);
-
-      // create SVG element
-      var svg = d3.select("#graph-ideal")
-            .append("svg")
-            .attr("width", w)         // note: these are reversed! that is ok for now.
-            .attr("height", h+120);   // +120 is to open up vertical space for annotation
-  
-      // add a group for each row of data
-      var groups = svg.selectAll("g")
-        .data(dataideal)
-        .enter()
-        .append("g")
-        .style("fill", function(d, i) {                   // replace this with actual color function at some point
-          var fillColor;                                  
-            if (i == 0) { fillColor = "#f8bc50";}         // yellow
-            else if (i == 1) { fillColor = "#c66728";}    // orange
-            else if (i == 2) { fillColor = "#ab4949";}    // red
-          return fillColor;      
-        });
-  
-      // add a rect for each data value
-      var rects = groups.selectAll("rect")
-        .data(function(d) { return d; })
-        .enter().append("rect")
-          .attr("x", function(d) { return yScale(d.y0); }) 
-          .attr("y", 128) // 128 is to shift chart down to make way for annotation
-          .attr("width", function(d) { return yScale(d.y); })
-          .attr("height", xScale.rangeBand());
-
-      // draw a line over the start of every rect
-      var lines = groups.selectAll("line")
-        .data(function(d) { return d; })
-        .enter().append("line")
-        .attr("y1", 0) 
-        .attr("y2", 220) 
-        .attr("x1", function(d) { return yScale(d.y0); }) 
-        .attr("x2", function(d) { return yScale(d.y0); })        
-        .style("stroke-width", 4)
-        .style("stroke", "white")
-        .style("fill", "none");
-
-      // add the last line at the end of the graph
-      var lastLine = svg.append("line") // interestingly, this line is oriented normally, hence y is actually y here, x is x etc.
-        .attr("y1", 0) 
-        .attr("y2", 220) 
-        .attr("x1", 1168) // this number is bullshit, needs to pull from width of svg - 2 for offset
-        .attr("x2", 1168) 
-        .style("stroke-width", 4)
-        .style("stroke", "white")
-        .style("fill", "none");
-
-      // fix the position of the first line of the graph
-      var lineFix = svg.selectAll('line'); // shift that first line 2px so it doesn't fall off the left side
-      lineFix.first()
-        .attr('transform', 'translate(2,0)');
-
-      // add label line 1
-      var textLabelOne = svg.selectAll() // need to separate bold and reg trext via tspans
-        .data(dataideal)
-        .enter().append("text")
-        .attr("class", "graph-label")
-        .style("font-weight", 700)
-        .attr("fill", "#231f20")
-        .attr("dx", function(d) { return yScale(d[0].y0)+10; })  // position horizontally
-        .attr("dy", "60")                                       // shift down from top of svg
-        .text(function(d) { return d[0].t1 + " " + d[0].t2; });
-
-      // add label line 2
-      var textLabelTwo = svg.selectAll()
-        .data(dataideal)
-        .enter().append("text")
-        .attr("class", "graph-label")
-        .attr("fill", "#231f20")
-        .attr("dx", function(d) { return yScale(d[0].y0)+10; })  // position horizontally
-        .attr("dy", "100")                                       // shift down from top of svg
-        .text(function(d) { return "$" + d[0].y; });
-
-
-
-
-
-
-// draw actual budget graph
-
-
-      var w = 1170;
-      var h = 100; // TODO: pull this from the container, not this magic number -- also refactor away from individual graphs
-
-
-      // array of arrays to feed d3 stack layout
-      var dataactual = [
-        [
-          { x: 0, y: baltfam.needs, t1: baltfam.needsperc, t2: "Needs:" }
-        ],
-        [ 
-          { x: 0, y: baltfam.lowants, t1: baltfam.wantsperc, t2: "Wants:"  }
-        ],
-        [
-          { x: 0, y: baltfam.losaves, t1: baltfam.savesperc, t2: "Saves:"  }
-        ]
-      ];
-
-      // stack that data
-      var stack = d3.layout.stack();
-      stack(dataactual);
-
-      // set up scales 
-      var xScale = d3.scale.ordinal()
-        .domain(d3.range(dataactual[0].length))
-        .rangeRoundBands([0, h], 0.05);
-    
-      var yScale = d3.scale.linear()
-        .domain([0,       
-          d3.max(dataactual, function(d) {
-            return d3.max(d, function(d) {
-              return d.y0 + d.y;
-            });
-          })
-        ])
-        .range([0, w]);
-
-      // create SVG element
-      var svg = d3.select("#graph-actual")
-            .append("svg")
-            .attr("width", w)         // note: these are reversed! that is ok for now.
-            .attr("height", h+120);   // +120 is to open up vertical space for annotation
-  
-      // add a group for each row of data
-      var groups = svg.selectAll("g")
-        .data(dataactual)
-        .enter().append("g")
-        .style("fill", function(d, i) {                   // replace this with actual color function at some point
-          var fillColor;                                  
-            if (i == 0) { fillColor = "#f8bc50";}         // yellow
-            else if (i == 1) { fillColor = "#c66728";}    // orange
-            else if (i == 2) { fillColor = "#ab4949";}    // red
-          return fillColor;      
-        });
-  
-      // add a rect for each data value
-      var rects = groups.selectAll("rect")
-        .data(function(d) { return d; })
-        .enter().append("rect")
-          .attr("x", function(d) { return yScale(d.y0); })
-          .attr("y", 128)               // 128 is to shift chart down to make way for annotation
-          .attr("width", function(d) { return yScale(d.y); })
-          .attr("height", xScale.rangeBand());
-
-      // draw a line over the start of every rect
-      var lines = groups.selectAll("line")
-        .data(function(d) { return d; })
-        .enter().append("line")
-        .attr("x1", function(d) { return yScale(d.y0); }) 
-        .attr("x2", function(d) { return yScale(d.y0); })        
-        .attr("y1", 218)
-        .attr("y2", 128) 
-        .style("stroke-width", 4)
-        .style("stroke", "white")
-        .style("fill", "none");
-
-      // add the last line at the end of the graph
-      var lastLine = svg.append("line") // interestingly, this line is oriented normally, hence y is actually y here, x is x etc.
-        .attr("y1", 130) 
-        .attr("y2", 220) 
-        .attr("x1", 1168) // this number is bullshit, needs to pull from width of svg - 2 for offset
-        .attr("x2", 1168) 
-        .style("stroke-width", 4)
-        .style("stroke", "white")
-        .style("fill", "none");
-
-      // fix the position of the first line of the graph
-      var lineFix = svg.selectAll('line'); // shift that first line 2px so it doesn't fall off the left side
-      lineFix.first()
-        .attr('transform', 'translate(2,0)');
-
-      // add dashed lines
-      var baseLine = svg.append("line")
-        .attr("y1", h*3) 
-        .attr("y2", 80) 
-        .attr("x1", 2) 
-        .attr("x2", 2) 
-        .style("stroke-width", 4)
-        .style("stroke", "white")
-        .style("fill", "none")
-        .style("stroke-dasharray", ("4, 8"));
-
-      // second dashed line
-      var baseLine = svg.append("line")
-        .attr("y1", h*3) 
-        .attr("y2", 80) 
-        .attr("x1", function(d) { return yScale(baltfam.fifty); })
-        .attr("x2", function(d) { return yScale(baltfam.fifty); })
-        .style("stroke-width", 4)
-        .style("stroke", "white")
-        .style("fill", "none")
-        .style("stroke-dasharray", ("4, 8"));
-
-      // third dashed line
-      var baseLine = svg.append("line")
-        .attr("y1", h*3) 
-        .attr("y2", 80) 
-        .attr("x1", function(d) { return yScale(baltfam.fifty) + yScale(baltfam.thirty); })
-        .attr("x2", function(d) { return yScale(baltfam.fifty) + yScale(baltfam.thirty); })
-        .style("stroke-width", 4)
-        .style("stroke", "white")
-        .style("fill", "none")
-        .style("stroke-dasharray", ("4, 8"));
-
-      // fourth dashed line
-      var baseLine = svg.append("line")
-        .attr("y1", h*3) 
-        .attr("y2", 80) 
-        .attr("x1", w-2)
-        .attr("x2", w-2)
-        .style("stroke-width", 4)
-        .style("stroke", "white")
-        .style("fill", "none")
-        .style("stroke-dasharray", ("4, 8"));
-
-      // add label line 1
-      var textLabelOne = svg.selectAll() // need to separate bold and reg trext via tspans
-        .data(dataactual)
-        .enter().append("text")
-        .attr("class", "graph-label")
-        .style("font-weight", 700)
-        .attr("fill", "#231f20")
-        .attr("dx", function(d) { return yScale(d[0].y0)+10; })  // position horizontally
-        .attr("dy", "60")                                       // shift down from top of svg
-        .text(function(d) { return d[0].t1 + "% " + d[0].t2; });
-
-      // add label line 2
-      var textLabelTwo = svg.selectAll()
-        .data(dataactual)
-        .enter().append("text")
-        .attr("class", "graph-label")
-        .attr("fill", "#231f20")
-        .attr("dx", function(d) { return yScale(d[0].y0)+10; })  // position horizontally
-        .attr("dy", "100")                                       // shift down from top of svg
-        .text(function(d) { return "$" + d[0].y; });
-
-
-
-
-
-
-
-// draw needs graphs
-
-
-      var w = 1170;
-      var h = 600; 
 
       var dataneeds = [
         [
@@ -513,16 +221,143 @@
         ]
       ];
 
+      var dataactual = [
+        [
+          { x: 0, y: baltfam.needs, t1: baltfam.needsperc, t2: "Needs:" }
+        ],
+        [ 
+          { x: 0, y: baltfam.lowants, t1: baltfam.wantsperc, t2: "Wants:"  }
+        ],
+        [
+          { x: 0, y: baltfam.losaves, t1: baltfam.savesperc, t2: "Saves:"  }
+        ]
+      ];
+
+      // stack each array
       var stack = d3.layout.stack();
+      stack(dataideal);
+      stack(dataactual);
       stack(dataneeds);
 
-      var xScale = d3.scale.ordinal()              // Bostock note: this is actually the Y scale
-        .domain(d3.range(dataneeds[0].length))
+      // set a few global dimenions
+      var w = 1170;           // global width -- TODO: pull this from the container, not this magic number
+      var lineHeight = 220;   // global line height for solid lines
+
+      d3.selection.prototype.first = function() {     // select first or last in a series - useful for appending lines
+        return d3.select(this[0][0]);
+      };
+
+
+      // DRAW IDEAL BUDGET GRAPH
+
+      var h = 100; 
+      var dataset = dataideal;
+
+      // set up scales 
+      var xScale = d3.scale.ordinal()           // actually y scale, since we're doing horizontal bars
+        .domain(d3.range(dataset[0].length))
+        .rangeRoundBands([0, h]);
+    
+      var yScale = d3.scale.linear()            // actually x scale
+        .domain([0,       
+          d3.max(dataset, function(d) {
+            return d3.max(d, function(d) {
+              return d.y0 + d.y;
+            });
+          })
+        ])
+        .range([0, w]);
+
+      // create SVG element
+      var svg = d3.select("#graph-ideal")
+            .append("svg")
+            .attr("width", w)        
+            .attr("height", h+120);   // +120 is to open up vertical space for annotation
+  
+      // add a group for each row of data
+      var groups = svg.selectAll("g")
+        .data(dataset)
+        .enter()
+        .append("g")
+        .style("fill", function(d, i) {                  
+          var fillColor;                                  
+            if (i == 0) { fillColor = "#f8bc50";}         // yellow
+            else if (i == 1) { fillColor = "#c66728";}    // orange
+            else if (i == 2) { fillColor = "#ab4949";}    // red
+          return fillColor;      
+        });
+  
+      // add a rect for each data value
+      var rects = groups.selectAll("rect")
+        .data(function(d) { return d; })
+        .enter().append("rect")
+          .attr("x", function(d) { return yScale(d.y0); }) 
+          .attr("y", 128)   // 128 is to shift chart down to make way for annotation
+          .attr("width", function(d) { return yScale(d.y); })
+          .attr("height", xScale.rangeBand());
+
+      // draw a line over the start of each rect
+      var lines = groups.selectAll("line")
+        .data(function(d) { return d; })
+        .enter().append("line")
+        .attr("y1", 0) 
+        .attr("y2", lineHeight) 
+        .attr("x1", function(d) { return yScale(d.y0); }) 
+        .attr("x2", function(d) { return yScale(d.y0); })        
+        .style("stroke-width", 4)
+        .style("stroke", "white")
+        .style("fill", "none");
+
+      // add the last line at the end of the graph
+      var lastLine = svg.append("line") 
+        .attr("y1", 0) 
+        .attr("y2", lineHeight) 
+        .attr("x1", w-2)
+        .attr("x2", w-2) 
+        .style("stroke-width", 4)
+        .style("stroke", "white")
+        .style("fill", "none");
+
+      // fix the position of the first line of the graph
+      var lineFix = svg.selectAll('line'); // shift that first line 2px so it doesn't fall off the left side
+      lineFix.first()
+        .attr('transform', 'translate(2,0)');
+
+      // add label line 1
+      var textLabelOne = svg.selectAll() // TODO: need to separate bold and regular text via tspans
+        .data(dataset)
+        .enter().append("text")
+        .attr("class", "graph-label")
+        .style("font-weight", 700)
+        .attr("fill", "#231f20")
+        .attr("dx", function(d) { return yScale(d[0].y0)+10; })  // position horizontally
+        .attr("dy", "60")                                        // position vertically -- TODO: pull these from calculated type size?
+        .text(function(d) { return d[0].t1 + " " + d[0].t2; });
+
+      // add label line 2
+      var textLabelTwo = svg.selectAll()
+        .data(dataset)
+        .enter().append("text")
+        .attr("class", "graph-label")
+        .attr("fill", "#231f20")
+        .attr("dx", function(d) { return yScale(d[0].y0)+10; })  // position horizontally
+        .attr("dy", "100")                                       // position vertically -- TODO: pull these from calculated type size?
+        .text(function(d) { return "$" + d[0].y; });
+
+
+      // DRAW NEEDS GRAPH 
+      
+      var h = 600; 
+      var dataset = dataneeds;
+
+      // reset scales -- TODO: would be nice to not have to set this each time...
+      var xScale = d3.scale.ordinal()              
+        .domain(d3.range(dataset[0].length))
         .rangeRoundBands([0, h]); 
 
-      var yScale = d3.scale.linear()               // Bostock note: this is actually the X Scale
+      var yScale = d3.scale.linear()               
         .domain([0,
-          d3.max(dataneeds, function(d) {
+          d3.max(dataset, function(d) {
             return d3.max(d, function(d) {
               return d.y0 + d.y;
             });
@@ -530,13 +365,15 @@
         ])
         .range([0, w]); 
 
+      // create new svg element
       var svg = d3.select("#graph-needs")
         .append("svg")
         .attr("width", w)
         .attr("height", h);
 
+      // add a group for each row of data
       var groups = svg.selectAll("g")
-        .data(dataneeds)
+        .data(dataset)
         .enter().append("g")
         .style("fill", function(d, i) {                   
           var fillColor;                                  
@@ -546,24 +383,25 @@
           return fillColor;      
         });
 
+      // add a rect for each data value
       var rects = groups.selectAll("rect")
         .data(function(d) {return d;})
         .enter().append("rect")
-        .attr("y", function(d, i) {
-          return xScale(i)+40; })                               // add value to this to push the whole graph down together
         .attr("x", function(d) { return yScale(d.y0); })
+        .attr("y", function(d, i) { return xScale(i)+50; })   // value adjusts vertical position of rects
         .attr("width", function(d) { return yScale(d.y); })
-        .attr("height", 60);                                    // sets height of each bar, no effect on position
+        .attr("height", 60);                                  // sets height of each bar, no effect on position
 
+      // add a label to each row, indicating which value (housing, healthcare etc.) is being added to the cumulative total
       var text = groups.selectAll("text")
         .data(function(d) {return d;})
         .enter().append("text")
         .attr("y", function(d, i) { return xScale(i)+32; })     // value adjusts vertical position of labels
-        .attr("x", function(d) { return yScale(d.y0)+6; })     // value adjusts horizontal position of labels
+        .attr("x", function(d) { return yScale(d.y0)+6; })      // value adjusts horizontal position of labels
         .attr("fill", "#231f20")
         .text(function(d) { 
-          if (d.section != null) { return d.section + " $" + d.y; }
-          else { return null; }
+          if (d.section != null) { return d.section + " $" + d.y; } // only add a label if 'section' exists in the object
+          else { return null; }                                     // TODO: maybe destroy the text element instead of return null?
         });
 
       // first dashed line
@@ -577,7 +415,7 @@
         .style("fill", "none")
         .style("stroke-dasharray", ("4, 8"));
 
-      // second dashed line
+      // second dashed line - 50% of ideal budget
       var baseLine = svg.append("line")
         .attr("y1", h) 
         .attr("y2", 0) 
@@ -588,7 +426,7 @@
         .style("fill", "none")
         .style("stroke-dasharray", ("4, 8"));
 
-      // third dashed line
+      // third dashed line - next 30% of ideal budget
       var baseLine = svg.append("line")
         .attr("y1", h) 
         .attr("y2", 0) 
@@ -610,11 +448,6 @@
         .style("fill", "none")
         .style("stroke-dasharray", ("4, 8"));
 
-
-
-
-
-
         // still to do:
         //  fix vertical spacing
         //  add labels and icons above chart
@@ -623,14 +456,146 @@
         //  maybe fix background colors into sections?
 
 
+      // DRAW ACTUAL BUDGET GRAPH
 
+      var dataset = dataactual;
+      var h = 100; 
 
+      // reset scales -- TODO: would be nice to not have to set this each time...
+      var xScale = d3.scale.ordinal()
+        .domain(d3.range(dataset[0].length))
+        .rangeRoundBands([0, h]);
+    
+      var yScale = d3.scale.linear()
+        .domain([0,       
+          d3.max(dataset, function(d) {
+            return d3.max(d, function(d) {
+              return d.y0 + d.y;
+            });
+          })
+        ])
+        .range([0, w]);
 
+      // create SVG element
+      var svg = d3.select("#graph-actual")
+            .append("svg")
+            .attr("width", w)         // note: these are reversed! that is ok for now.
+            .attr("height", h+120);   // +120 is to open up vertical space for annotation
+  
+      // add a group for each row of data
+      var groups = svg.selectAll("g")
+        .data(dataset)
+        .enter().append("g")
+        .style("fill", function(d, i) {                   
+          var fillColor;                                  
+            if (i == 0) { fillColor = "#f8bc50";}         // yellow
+            else if (i == 1) { fillColor = "#c66728";}    // orange
+            else if (i == 2) { fillColor = "#ab4949";}    // red
+          return fillColor;      
+        });
+  
+      // add a rect for each data value
+      var rects = groups.selectAll("rect")
+        .data(function(d) { return d; })
+        .enter().append("rect")
+          .attr("x", function(d) { return yScale(d.y0); })
+          .attr("y", 128)               // 128 is to shift chart down to make way for annotation
+          .attr("width", function(d) { return yScale(d.y); })
+          .attr("height", xScale.rangeBand());
 
+      // draw a line over the start of every rect
+      var lines = groups.selectAll("line")
+        .data(function(d) { return d; })
+        .enter().append("line")
+        .attr("x1", function(d) { return yScale(d.y0); }) 
+        .attr("x2", function(d) { return yScale(d.y0); })        
+        .attr("y1", 128)
+        .attr("y2", lineHeight) 
+        .style("stroke-width", 4)
+        .style("stroke", "white")
+        .style("fill", "none");
 
+      // add the last line at the end of the graph
+      var lastLine = svg.append("line")
+        .attr("x1", w-2) 
+        .attr("x2", w-2) 
+        .attr("y1", 128) 
+        .attr("y2", lineHeight) 
+        .style("stroke-width", 4)
+        .style("stroke", "white")
+        .style("fill", "none");
 
+      // fix the position of the first line of the graph
+      var lineFix = svg.selectAll('line'); // shift that first line 2px so it doesn't fall off the left side
+      lineFix.first()
+        .attr('transform', 'translate(2,0)');
 
+      var dashedHeight = 80;
 
+      // add dashed lines
+      var baseLine = svg.append("line")
+        .attr("y1", h*3) 
+        .attr("y2", dashedHeight) 
+        .attr("x1", 2) 
+        .attr("x2", 2) 
+        .style("stroke-width", 4)
+        .style("stroke", "white")
+        .style("fill", "none")
+        .style("stroke-dasharray", ("4, 8"));
+
+      // second dashed line
+      var baseLine = svg.append("line")
+        .attr("y1", h*3) 
+        .attr("y2", dashedHeight) 
+        .attr("x1", function(d) { return yScale(baltfam.fifty); })
+        .attr("x2", function(d) { return yScale(baltfam.fifty); })
+        .style("stroke-width", 4)
+        .style("stroke", "white")
+        .style("fill", "none")
+        .style("stroke-dasharray", ("4, 8"));
+
+      // third dashed line
+      var baseLine = svg.append("line")
+        .attr("y1", h*3) 
+        .attr("y2", dashedHeight) 
+        .attr("x1", function(d) { return yScale(baltfam.fifty) + yScale(baltfam.thirty); })
+        .attr("x2", function(d) { return yScale(baltfam.fifty) + yScale(baltfam.thirty); })
+        .style("stroke-width", 4)
+        .style("stroke", "white")
+        .style("fill", "none")
+        .style("stroke-dasharray", ("4, 8"));
+
+      // fourth dashed line
+      var baseLine = svg.append("line")
+        .attr("y1", h*3) 
+        .attr("y2", dashedHeight) 
+        .attr("x1", w-2)
+        .attr("x2", w-2)
+        .style("stroke-width", 4)
+        .style("stroke", "white")
+        .style("fill", "none")
+        .style("stroke-dasharray", ("4, 8"));
+
+      // add label line 1
+      var textLabelOne = svg.selectAll() // TODO: need to separate bold and reg trext via tspans
+        .data(dataset)
+        .enter().append("text")
+        .attr("class", "graph-label")
+        .style("font-weight", 700)
+        .attr("fill", "#231f20")
+        .attr("dx", function(d) { return yScale(d[0].y0)+10; })  // position horizontally
+        .attr("dy", "60")                                       // shift down from top of svg
+        .text(function(d) { return d[0].t1 + "% " + d[0].t2; });
+
+      // add label line 2
+      var textLabelTwo = svg.selectAll()
+        .data(dataset)
+        .enter().append("text")
+        .attr("class", "graph-label")
+        .attr("fill", "#231f20")
+        .attr("dx", function(d) { return yScale(d[0].y0)+10; })  // position horizontally
+        .attr("dy", "100")                                       // shift down from top of svg
+        .text(function(d) { return "$" + d[0].y; });
 
     </script>
 
@@ -639,12 +604,10 @@
 <!-- 
 
       still to do: 
-        convert ideal and actual drawings to correct horz layout approach
         fix labeling layout on actual budget
         add dashed lines to same ^^^
         pull overall width from grid container
         map all text numbers to data points - jquery
-        refactor
         styling pass / convert to sass?
         object type, data input (csv?) and city / household selection
 
