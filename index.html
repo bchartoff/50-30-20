@@ -240,8 +240,8 @@
       stack(dataneeds);
 
       // set a few global dimenions
-      var w = 1170;           // global width -- TODO: pull this from the container, not this magic number
-      var lineHeight = 220;   // global line height for solid lines
+      var w = $( ".row" ).width()-30;  // global width - since this is set by Foundation, pull it from the "row" div
+      var lineHeight = 220;            // global line height for solid lines
 
       d3.selection.prototype.first = function() {     // select first or last in a series - useful for appending lines
         return d3.select(this[0][0]);
