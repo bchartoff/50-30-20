@@ -63,6 +63,7 @@
       .strong {font-size:1.7em; font-weight:700;}
       .money-label {font-weight:400; font-size:.5em; color:#231f20;}
       .graph-label {font-weight:400; font-size:1.7em; color:#231f20;}
+      .actual-label {font-weight:400; font-size:1.7em; color:#231f20;}
 
 
       img {display: block; margin: 1em auto;}
@@ -184,7 +185,7 @@
         baltfam.overneeds = Math.round(baltfam.needs - baltfam.fifty);
         baltfam.overneedsperc = (Math.round((baltfam.needsperc - 0.5)*100))/100;
 
-      // setup data arrays for each graph
+      // setup an array for each graph
       var dataideal = [
         [
           { x: 0, y: baltfam.fifty, t1: "50%", t2: "Needs:" }
@@ -240,10 +241,10 @@
       stack(dataneeds);
 
       // set a few global dimenions
-      var w = $( ".row" ).width()-30;  // global width - since this is set by Foundation, pull it from the "row" div
-      var lineHeight = 220;            // global line height for solid lines
+      var w = $( "div.row" ).width()-30;  // global width - since this is set by Foundation, pull it from the "row" div
+      var lineHeight = 220;               // global line height for solid lines
 
-      d3.selection.prototype.first = function() {     // select first or last in a series - useful for appending lines
+      d3.selection.prototype.first = function() {     // select first in a series - useful for appending lines
         return d3.select(this[0][0]);
       };
 
@@ -309,7 +310,7 @@
         .style("fill", "none");
 
       // add the last line at the end of the graph
-      var lastLine = svg.append("line") 
+      svg.append("line") 
         .attr("y1", 0) 
         .attr("y2", lineHeight) 
         .attr("x1", w-2)
@@ -319,7 +320,7 @@
         .style("fill", "none");
 
       // fix the position of the first line of the graph
-      var lineFix = svg.selectAll('line'); // shift that first line 2px so it doesn't fall off the left side
+      var lineFix = svg.selectAll('line'); 
       lineFix.first()
         .attr('transform', 'translate(2,0)');
 
@@ -331,7 +332,7 @@
         .style("font-weight", 700)
         .attr("fill", "#231f20")
         .attr("dx", function(d) { return yScale(d[0].y0)+10; })  // position horizontally
-        .attr("dy", "60")                                        // position vertically -- TODO: pull these from calculated type size?
+        .attr("dy", "60")                                        // position vertically -- TODO: base these on type size?
         .text(function(d) { return d[0].t1 + " " + d[0].t2; });
 
       // add label line 2
@@ -341,7 +342,7 @@
         .attr("class", "graph-label")
         .attr("fill", "#231f20")
         .attr("dx", function(d) { return yScale(d[0].y0)+10; })  // position horizontally
-        .attr("dy", "100")                                       // position vertically -- TODO: pull these from calculated type size?
+        .attr("dy", "100")                                       // position vertically -- TODO: base these on type size?
         .text(function(d) { return "$" + d[0].y; });
 
 
@@ -350,7 +351,7 @@
       var h = 600; 
       var dataset = dataneeds;
 
-      // reset scales -- TODO: would be nice to not have to set this each time...
+      // reset scales -- TODO: would be nice to turn this into a function since it's the same across all 3 graphs...
       var xScale = d3.scale.ordinal()              
         .domain(d3.range(dataset[0].length))
         .rangeRoundBands([0, h]); 
@@ -400,12 +401,12 @@
         .attr("x", function(d) { return yScale(d.y0)+6; })      // value adjusts horizontal position of labels
         .attr("fill", "#231f20")
         .text(function(d) { 
-          if (d.section != null) { return d.section + " $" + d.y; } // only add a label if 'section' exists in the object
-          else { return null; }                                     // TODO: maybe destroy the text element instead of return null?
+          if (d.section != null) { return d.section + " $" + d.y; } // only add label if 'section' exists in the object
+          else { return null; }                                     // TODO: destroy the text element instead of return null?
         });
 
       // first dashed line
-      var baseLine = svg.append("line")
+      svg.append("line")
         .attr("y1", h) 
         .attr("y2", 0) 
         .attr("x1", 2) 
@@ -416,7 +417,7 @@
         .style("stroke-dasharray", ("4, 8"));
 
       // second dashed line - 50% of ideal budget
-      var baseLine = svg.append("line")
+      svg.append("line")
         .attr("y1", h) 
         .attr("y2", 0) 
         .attr("x1", function(d) { return yScale(baltfam.fifty); })
@@ -427,7 +428,7 @@
         .style("stroke-dasharray", ("4, 8"));
 
       // third dashed line - next 30% of ideal budget
-      var baseLine = svg.append("line")
+      svg.append("line")
         .attr("y1", h) 
         .attr("y2", 0) 
         .attr("x1", function(d) { return yScale(baltfam.fifty) + yScale(baltfam.thirty); })
@@ -438,7 +439,7 @@
         .style("stroke-dasharray", ("4, 8"));
 
       // fourth dashed line
-      var baseLine = svg.append("line")
+      svg.append("line")
         .attr("y1", h) 
         .attr("y2", 0) 
         .attr("x1", w-2)
@@ -461,7 +462,7 @@
       var dataset = dataactual;
       var h = 100; 
 
-      // reset scales -- TODO: would be nice to not have to set this each time...
+      // reset scales -- same as above...
       var xScale = d3.scale.ordinal()
         .domain(d3.range(dataset[0].length))
         .rangeRoundBands([0, h]);
@@ -479,8 +480,8 @@
       // create SVG element
       var svg = d3.select("#graph-actual")
             .append("svg")
-            .attr("width", w)         // note: these are reversed! that is ok for now.
-            .attr("height", h+120);   // +120 is to open up vertical space for annotation
+            .attr("width", w)         
+            .attr("height", h+120);   // +120 opens up vertical space for annotation
   
       // add a group for each row of data
       var groups = svg.selectAll("g")
@@ -516,7 +517,7 @@
         .style("fill", "none");
 
       // add the last line at the end of the graph
-      var lastLine = svg.append("line")
+      svg.append("line")
         .attr("x1", w-2) 
         .attr("x2", w-2) 
         .attr("y1", 128) 
@@ -526,14 +527,14 @@
         .style("fill", "none");
 
       // fix the position of the first line of the graph
-      var lineFix = svg.selectAll('line'); // shift that first line 2px so it doesn't fall off the left side
+      var lineFix = svg.selectAll('line'); 
       lineFix.first()
         .attr('transform', 'translate(2,0)');
 
       var dashedHeight = 80;
 
       // add dashed lines
-      var baseLine = svg.append("line")
+      svg.append("line")
         .attr("y1", h*3) 
         .attr("y2", dashedHeight) 
         .attr("x1", 2) 
@@ -544,7 +545,7 @@
         .style("stroke-dasharray", ("4, 8"));
 
       // second dashed line
-      var baseLine = svg.append("line")
+      svg.append("line")
         .attr("y1", h*3) 
         .attr("y2", dashedHeight) 
         .attr("x1", function(d) { return yScale(baltfam.fifty); })
@@ -555,7 +556,7 @@
         .style("stroke-dasharray", ("4, 8"));
 
       // third dashed line
-      var baseLine = svg.append("line")
+      svg.append("line")
         .attr("y1", h*3) 
         .attr("y2", dashedHeight) 
         .attr("x1", function(d) { return yScale(baltfam.fifty) + yScale(baltfam.thirty); })
@@ -566,7 +567,7 @@
         .style("stroke-dasharray", ("4, 8"));
 
       // fourth dashed line
-      var baseLine = svg.append("line")
+      svg.append("line")
         .attr("y1", h*3) 
         .attr("y2", dashedHeight) 
         .attr("x1", w-2)
@@ -580,7 +581,7 @@
       var textLabelOne = svg.selectAll() // TODO: need to separate bold and reg trext via tspans
         .data(dataset)
         .enter().append("text")
-        .attr("class", "graph-label")
+        .attr("class", "actual-label")
         .style("font-weight", 700)
         .attr("fill", "#231f20")
         .attr("dx", function(d) { return yScale(d[0].y0)+10; })  // position horizontally
@@ -591,23 +592,60 @@
       var textLabelTwo = svg.selectAll()
         .data(dataset)
         .enter().append("text")
-        .attr("class", "graph-label")
+        .attr("class", "actual-label")
         .attr("fill", "#231f20")
         .attr("dx", function(d) { return yScale(d[0].y0)+10; })  // position horizontally
         .attr("dy", "100")                                       // shift down from top of svg
         .text(function(d) { return "$" + d[0].y; });
 
+      // re-arrange labels to prevent overlap -- TODO: adapt this to shift labels left, connect to rect with line
+      function arrangeLabels() {
+        var move = 1;
+        while(move > 0) {
+          move = 0;
+          svg.selectAll(".actual-label")
+             .each(function() {
+               var that = this,
+                   a = this.getBoundingClientRect(); // bounding box of current label
+               svg.selectAll(".actual-label")
+                  .each(function() {
+                    if(this != that) {
+                      var b = this.getBoundingClientRect(); // bounding box of label to compare to current label
+                      if((Math.abs(a.left - b.left) * 2 < (a.width + b.width)) &&
+                         (Math.abs(a.top - b.top) * 2 < (a.height + b.height))) {
+                        // overlap, move labels
+                        var dx = (Math.max(0, a.right - b.left) +
+                                 Math.min(0, a.left - b.right)) * 0.01,
+                            dy = (Math.max(0, a.bottom - b.top) +
+                                 Math.min(0, a.top - b.bottom)) * 0.02,
+                            tt = d3.transform(d3.select(this).attr("transform")),
+                            to = d3.transform(d3.select(that).attr("transform"));
+                        move += Math.abs(dx) + Math.abs(dy);
+                      
+                        to.translate = [ to.translate[0] + dx, to.translate[1] + dy ];
+                        tt.translate = [ tt.translate[0] - dx, tt.translate[1] - dy ];
+                        d3.select(this).attr("transform", "translate(" + tt.translate + ")");
+                        d3.select(that).attr("transform", "translate(" + to.translate + ")");
+                        a = this.getBoundingClientRect();
+                      }
+                    }
+                  });
+             });
+        }
+      }
+
+
+
+
     </script>
 
-
+<!-- <input id="clickMe" type="button" value="clickme" onclick="arrangeLabels();" /> --> 
 
 <!-- 
 
       still to do: 
         fix labeling layout on actual budget
-        add dashed lines to same ^^^
-        pull overall width from grid container
-        map all text numbers to data points - jquery
+        map all text numbers to data points, most are currently static...
         styling pass / convert to sass?
         object type, data input (csv?) and city / household selection
 
