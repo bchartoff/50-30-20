@@ -64,6 +64,7 @@
       .money-label {font-weight:400; font-size:.5em; color:#231f20;}
       .graph-label {font-weight:400; font-size:1.7em; color:#231f20;}
       .actual-label {font-weight:400; font-size:1.7em; color:#231f20;}
+      .needs-label {font-weight:400; font-size:1.5em; color:#231f20;}
 
 
       img {display: block; margin: 1em auto;}
@@ -84,8 +85,6 @@
 
   </head>
   <body>
-
-
 
     <div class="row scenario">
       <div class="row">
@@ -150,6 +149,21 @@
       </div>
     </div>
 
+
+    <!-- pattern definition for stripes in Needs graph --> 
+    <svg height="10" width="10" xmlns="http://www.w3.org/2000/svg" version="1.1"> 
+      <defs> 
+        <pattern id="diagonal-stripe-2" patternUnits="userSpaceOnUse" width="10" height="10"> 
+          <rect width='10' height='10' fill='#f8bc50'/>
+          <path d='M-1,1 l2,-2
+                   M0,10 l10,-10
+                   M9,11 l2,-2' stroke='#fae9b8' stroke-width='2.5'/>
+          </image> 
+        </pattern> 
+      </defs> 
+    </svg>
+
+
     <script src="js/vendor/jquery.js"></script>
     <script src="js/vendor/what-input.js"></script>
     <script src="js/vendor/foundation.js"></script>
@@ -207,11 +221,11 @@
             { x: 4, y: baltfam.housing + baltfam.health + baltfam.grocery + baltfam.transit }   
         ],
         [
-            { section: "Housing & Utilities", x: 0, y: baltfam.housing }, 
-            { section: "Healthcare", x: 1, y: baltfam.health }, 
-            { section: "Groceries", x: 2, y: baltfam.grocery }, 
-            { section: "Transportation", x: 3, y: baltfam.transit },
-            { section: "Childcare", x: 4, y: baltfam.childcare } 
+            { section: "Housing & Utilities", icon: "housing.svg", x: 0, y: baltfam.housing }, 
+            { section: "Healthcare", icon: "health.svg", x: 1, y: baltfam.health }, 
+            { section: "Groceries", icon: "grocery.svg", x: 2, y: baltfam.grocery }, 
+            { section: "Transportation", icon: "transit.svg", x: 3, y: baltfam.transit },
+            { section: "Childcare", icon: "childcare.svg", x: 4, y: baltfam.childcare } 
         ],
         [
             { x: 0, y: baltfam.takehome - baltfam.housing },
@@ -378,9 +392,9 @@
         .enter().append("g")
         .style("fill", function(d, i) {                   
           var fillColor;                                  
-            if (i == 0) { fillColor = "#f8bc50";}         // solid yellow
-            else if (i == 1) { fillColor = "#f7cf8f";}    // light yellow -- this should be pattern fill    
-            else if (i == 2) { fillColor = "#e8e8e8";}    // gray
+            if (i == 0) { fillColor = "#f8bc50" ;}         // solid yellow
+            else if (i == 1) { fillColor = "url(#diagonal-stripe-2)" ;}    // pattern fill defined in svg in html 
+            else if (i == 2) { fillColor = "#e8e8e8" ;}    // gray
           return fillColor;      
         });
 
@@ -397,13 +411,27 @@
       var text = groups.selectAll("text")
         .data(function(d) {return d;})
         .enter().append("text")
-        .attr("y", function(d, i) { return xScale(i)+32; })     // value adjusts vertical position of labels
-        .attr("x", function(d) { return yScale(d.y0)+6; })      // value adjusts horizontal position of labels
+        .attr("y", function(d, i) { return xScale(i)+35; })     // value adjusts vertical position of labels
+        .attr("x", function(d) { return yScale(d.y0)+32; })      // value adjusts horizontal position of labels
         .attr("fill", "#231f20")
+        .attr("class", "needs-label")
         .text(function(d) { 
           if (d.section != null) { return d.section + " $" + d.y; } // only add label if 'section' exists in the object
           else { return null; }                                     // TODO: destroy the text element instead of return null?
-        });
+        })
+
+      var icons = groups.selectAll("svg") // add svg icons to labels
+        .data(function(d) {return d;})
+        .enter().append("svg:image")
+        .attr("xlink:href", function(d) {
+          if(d.icon != null) {
+            return "img/" + d.icon; }
+          else { return null; }
+        })
+        .attr("y", function(d, i) { return xScale(i)+16; })     
+        .attr("x", function(d) { return yScale(d.y0)+6; })
+        .attr("width", 20)      
+        .attr("height", 20);
 
       // first dashed line
       svg.append("line")
