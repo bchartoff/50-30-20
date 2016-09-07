@@ -91,14 +91,14 @@
         <div class="large-12 columns">
           <h2>Scenario:</h2>
         </div>
-        <div class="large-6 columns">
+        <div class="small-12 large-6 columns">
           <h3>LOCATION:</h3>
           <img class="map" src="./img/map.png" />
           <p class="strong">Baltimore, MD</p>
           <p>Population: 622,793 
           <p>Area: 92.98 mi&sup2;</p>
         </div>
-        <div class="large-6 columns">
+        <div class="small-12 large-6 columns">
           <h3>HOUSEHOLD:</h3>
           <img class="fam" src="./img/fam.png" />
           <p>Family of 4. Both adults work.</p>
@@ -106,7 +106,7 @@
         </div>
       </div>
       <div class="row">
-        <div class="large-3 large-centered columns">
+        <div class="small-4 large-3 large-centered small-centered columns">
           <h3>MEDIAN INCOME:</h3>
           <p class="left blue strong">$69,402</p>
           <p class="right blue strong">$4,577<span class="money-label">/month</span></p>
@@ -117,34 +117,34 @@
 
 
     <div class="row ideal">
-      <div class="large-12 columns">
+      <div class="small-12 large-12 columns">
         <h2>Ideal Budget:</h2>
         <p>Monthly pay ($4,577) divided into what you should be spending in each category.</p>
       </div>
-      <div class="large-12 columns">
+      <div class="small-12 large-12 columns">
         <div id="graph-ideal"></div>
       </div>
     </div>
 
     <div class="row needs">
-      <div class="large-12 columns">
+      <div class="small-12 large-12 columns">
         <h2>Needs Total:</h2>
         <p>Adding each item in the needs category to find out what is being spend on average on necessities.</p>
       </div>
-      <div class="large-12 columns">
+      <div class="small-12 large-12 columns">
         <div id="graph-needs"></div>
       </div>
     </div>
 
     <div class="row actual">
-      <div class="large-12 columns">
+      <div class="small-12 large-12 columns">
         <h2>Actual Budget:</h2>
         <p>Taking the total amount spent on needs then figuring out if needs are under budget and what is left for wants and savings.</p>
       </div>
-      <div class="large-12 columns">
+      <div class="small-12 large-12 columns">
         <div id="graph-actual"></div>
       </div>
-      <div class="large-12 columns">
+      <div class="small-12 large-12 columns">
         <p><br />Needs are <strong>$1,759</strong> and <strong>38%</strong> over the ideal budget which leaves this family little room for items they may want like a car or a cell phone or having any money to put towards savigns or debt repayment.</p>
       </div>
     </div>
@@ -384,7 +384,7 @@
       var svg = d3.select("#graph-needs")
         .append("svg")
         .attr("width", w)
-        .attr("height", h);
+        .attr("height", h);    
 
       // add a group for each row of data
       var groups = svg.selectAll("g")
@@ -493,6 +493,9 @@
         .style("stroke-dasharray", ("4, 8"));
 
 
+
+
+
       // DRAW ACTUAL BUDGET GRAPH
 
       var dataset = dataactual;
@@ -569,6 +572,7 @@
 
       var dashedHeight = 80;
 
+      // TODO: firgure out how to layer these: above the rects, below the labels & icons
       // add dashed lines
       svg.append("line")
         .attr("y1", h*3) 
@@ -647,9 +651,20 @@
                   .each(function() {
                     if(this != that) {
                       var b = this.getBoundingClientRect(); // bounding box of label to compare to current label
+
                       if((Math.abs(a.left - b.left) * 2 < (a.width + b.width)) &&
-                         (Math.abs(a.top - b.top) * 2 < (a.height + b.height))) {
-                        // overlap, move labels
+                         (Math.abs(a.top - b.top) * 2 < (a.height + b.height))) { // hit detection...
+
+                      // hit detection also needs to check that the bounding box isn't off the grid 
+                      // labels need to be grouped so they can be moved together...
+                      // actions:
+                      // - move the label up one lineHeight
+                      // - clear it to the left 100px at a time
+                      // - draw the connecting line
+                      // on to the next...
+
+
+                       /* 
                         var dx = (Math.max(0, a.right - b.left) +
                                  Math.min(0, a.left - b.right)) * 0.01,
                             dy = (Math.max(0, a.bottom - b.top) +
@@ -657,12 +672,12 @@
                             tt = d3.transform(d3.select(this).attr("transform")),
                             to = d3.transform(d3.select(that).attr("transform"));
                         move += Math.abs(dx) + Math.abs(dy);
-                      
                         to.translate = [ to.translate[0] + dx, to.translate[1] + dy ];
                         tt.translate = [ tt.translate[0] - dx, tt.translate[1] - dy ];
                         d3.select(this).attr("transform", "translate(" + tt.translate + ")");
                         d3.select(that).attr("transform", "translate(" + to.translate + ")");
                         a = this.getBoundingClientRect();
+                        */
                       }
                     }
                   });
@@ -672,7 +687,9 @@
 
     </script>
 
-<!-- <input id="clickMe" type="button" value="clickme" onclick="arrangeLabels();" /> --> 
+                        <!-- 
+                        <input id="clickMe" type="button" value="clickme" onclick="arrangeLabels();" /> 
+                        -->
 
 <!-- 
 
