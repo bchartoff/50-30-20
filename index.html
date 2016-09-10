@@ -35,6 +35,7 @@
 
       .scenario {
         margin-top:1em;
+        padding:0 0.935rem;
       }
 
       .ideal, .actual {
@@ -55,19 +56,19 @@
 
       h1 {font-weight:400; font-size:4.0em;}
       h2 {font-weight:300; font-size:3.2em; margin-top:16px;}
-      h3 {font-weight:700; font-size:1.2em;}
+      h3 {font-weight:700; font-size:1.2em; text-align:left;}
       p, li {font-weight:400; font-size:1em;}
 
-      h3, .scenario p {text-align:center;}
+      .scenario p {margin: 0; text-align:left;}
       .blue {color:#00a79d;}
       .strong {font-size:1.7em; font-weight:700;}
-      .money-label {font-weight:400; font-size:.5em; color:#231f20;}
+      .money-label {font-weight:400; font-size:0.5em; color:#231f20;}
       .graph-label {font-weight:400; font-size:1.7em; color:#231f20;}
       .actual-label {font-weight:400; font-size:1.7em; color:#231f20;}
       .needs-label {font-weight:400; font-size:1.5em; color:#231f20;}
 
 
-      img {display: block; margin: 1em auto;}
+      img {display: block; margin: 0.5em auto;}
 
       .left {float:left;}
       .right {float:right;}
@@ -93,26 +94,32 @@
         <div class="large-12 columns">
           <h2>Scenario:</h2>
         </div>
-        <div class="small-12 large-6 columns">
+        <div class="small-12 large-4 columns">
           <h3>LOCATION:</h3>
+          <select name="location">
+            <option value="balt">Baltimore, MD</option>
+          </select>
           <img class="map" src="./img/map.png" />
-          <p class="strong">Baltimore, MD</p>
           <p>Population: 622,793 
           <p>Area: 92.98 mi&sup2;</p>
         </div>
-        <div class="small-12 large-6 columns">
+        <div class="small-12 large-4 columns">
           <h3>HOUSEHOLD:</h3>
+          <select name="household">
+            <option value="family">2 adults 2 children</option>
+          </select>
           <img class="fam" src="./img/fam.png" />
           <p>Family of 4. Both adults work.</p>
           <p>One child is 4, the other is 8.</p>
         </div>
-      </div>
-      <div class="row">
-        <div class="small-4 large-3 large-centered small-centered columns">
-          <h3>MEDIAN INCOME:</h3>
-          <p class="left blue strong">$69,402</p>
-          <p class="right blue strong">$4,577<span class="money-label">/month</span></p>
-          <p class="clear">$45,552 above federal poverty level based on the median per capita income.</p>
+        <div class="small-12 large-4 columns">
+          <h3>INCOME LEVEL:</h3>
+          <select name="location">
+            <option value="average">Average</option>
+          </select>
+          <p class="blue strong">$69,402</p>
+          <p class="blue strong">$4,577<span class="money-label">/month</span></p>
+          <p class="clear">$45,552 above federal poverty level.</p>
         </div>
       </div>
   </div>
@@ -275,14 +282,14 @@
 
       drawAll(); 
 
+      // on resize...
+      d3.select(window).on("resize", resize); // listen for window resize and resize graphs
       // get new width and redraw the graphs
       function resize() { 
-        console.log("resize fired");
+        console.log("resize fired");  // TODO: figure out why it's not registering new w value and delete this
         var w = d3.select("div.row").node().getBoundingClientRect().width - 30;
         drawAll();
       }
-
-      d3.select(window).on("resize", resize); // listen for window resize and resize graphs
 
       // http://stackoverflow.com/questions/16265123/resize-svg-when-window-is-resized-in-d3-js/21938056#21938056
       // ^^^ this might be a better method...
@@ -520,11 +527,6 @@
           .style("stroke-dasharray", ("4, 8"));
       }
 
-
-
-
-
-
       // DRAW ACTUAL BUDGET GRAPH
       function drawActual() {
 
@@ -573,6 +575,41 @@
             .attr("y", 128)               // 128 is to shift chart down to make way for annotation
             .attr("width", function(d) { return yScale(d.y); })
             .attr("height", xScale.rangeBand());
+
+        // add label line 1
+        var textLabelOne = groups.selectAll("text") // TODO: need to separate bold and reg trext via tspans
+          .data(function(d) { return d; })
+          .enter().append("text")
+            .attr("class", "actual-label")
+            .style("font-weight", 700)
+            .attr("fill", "#231f20")
+            .attr("dx", function(d) { return yScale(d.y0)+10; })  // position horizontally
+            .attr("dy", "80")                                       // shift down from top of svg
+            .html(function(d) { return d.t1 + "% " + d.t2 + "<br /> $" + d.y; });
+
+/*
+        // add label line 1
+        var textLabelOne = svg.selectAll() // TODO: need to separate bold and reg trext via tspans
+          .data(dataset)
+          .enter().append("text")
+          .attr("class", "actual-label")
+          .style("font-weight", 700)
+          .attr("fill", "#231f20")
+          .attr("dx", function(d) { return yScale(d[0].y0)+10; })  // position horizontally
+          .attr("dy", "60")                                       // shift down from top of svg
+          .text(function(d) { return d[0].t1 + "% " + d[0].t2; });
+
+        // add label line 2
+        var textLabelTwo = svg.selectAll()
+          .data(dataset)
+          .enter().append("text")
+          .attr("class", "actual-label")
+          .attr("fill", "#231f20")
+          .attr("dx", function(d) { return yScale(d[0].y0)+10; })  // position horizontally
+          .attr("dy", "100")                                       // shift down from top of svg
+          .text(function(d) { return "$" + d[0].y; });
+
+          */
 
         // draw a line over the start of every rect
         var lines = groups.selectAll("line")
@@ -648,26 +685,7 @@
           .style("fill", "none")
           .style("stroke-dasharray", ("4, 8"));
 
-        // add label line 1
-        var textLabelOne = svg.selectAll() // TODO: need to separate bold and reg trext via tspans
-          .data(dataset)
-          .enter().append("text")
-          .attr("class", "actual-label")
-          .style("font-weight", 700)
-          .attr("fill", "#231f20")
-          .attr("dx", function(d) { return yScale(d[0].y0)+10; })  // position horizontally
-          .attr("dy", "60")                                       // shift down from top of svg
-          .text(function(d) { return d[0].t1 + "% " + d[0].t2; });
 
-        // add label line 2
-        var textLabelTwo = svg.selectAll()
-          .data(dataset)
-          .enter().append("text")
-          .attr("class", "actual-label")
-          .attr("fill", "#231f20")
-          .attr("dx", function(d) { return yScale(d[0].y0)+10; })  // position horizontally
-          .attr("dy", "100")                                       // shift down from top of svg
-          .text(function(d) { return "$" + d[0].y; });
 
       }
 
