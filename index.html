@@ -271,6 +271,23 @@
         return d3.select(this[0][0]);
       };
 
+      // move selection to front
+      d3.selection.prototype.moveToFront = function() {  
+        return this.each(function(){
+          this.parentNode.appendChild(this);
+        });
+      };
+
+      // move selection to back
+      d3.selection.prototype.moveToBack = function() {  
+          return this.each(function() { 
+              var firstChild = this.parentNode.firstChild; 
+              if (firstChild) { 
+                  this.parentNode.insertBefore(this, firstChild); 
+              } 
+          });
+      };
+
       // draw all three graphs
       function drawAll() { 
         d3.selectAll("svg.graph").remove();
@@ -440,47 +457,6 @@
           .attr("width", function(d) { return yScale(d.y); })
           .attr("height", 60);                                  // value sets height of each bar, no effect on position
 
-        // add a label to each row, indicating which value (housing, healthcare etc.) is being added to the cumulative total
-        var text = groups.selectAll("text")
-          .data(function(d) {return d;})
-          .enter().append("text")
-          .attr("y", function(d, i) { return xScale(i)+35; })     // value adjusts vertical position of labels
-          .attr("x", function(d) { return yScale(d.y0)+32; })      // value adjusts horizontal position of labels
-          .attr("fill", "#231f20")
-          .attr("class", "needs-label")
-          .text(function(d) { 
-            if (d.section != null) { return d.section + " +$" + d.y; } // only add label if 'section' exists in the object
-            else { return null; }                                      // TODO: destroy the text element instead of return null
-          })
-
-        // add svg icons to text labels
-        var icons = groups.selectAll("svg") 
-          .data(function(d) {return d;})
-          .enter().append("svg:image")
-          .attr("xlink:href", function(d) {
-            if(d.icon != null) {
-              return "img/" + d.icon; }
-            else { return null; }
-          })
-          .attr("y", function(d, i) { return xScale(i)+16; })     
-          .attr("x", function(d) { return yScale(d.y0)+6; })
-          .attr("width", 20)      
-          .attr("height", 20);
-
-        // add below-the-bar icons -- TODO: add addl icons for subsequent bars at same x location...
-        var subIcons = groups.selectAll("svg")
-          .data(function(d) {return d;})
-          .enter().append("svg:image")
-          .attr("xlink:href", function(d) {
-            if(d.icon != null) {
-              return "img/grey-" + d.icon; }
-            else { return null; }
-          })
-          .attr("y", function(d, i) { return xScale(i)+116; })     
-          .attr("x", function(d) { return yScale(d.y0)+(yScale(d.y)/2)-10; })
-          .attr("width", 20)      
-          .attr("height", 20);      
-
         // first dashed line
         svg.append("line")
           .attr("y1", h) 
@@ -524,6 +500,47 @@
           .style("stroke", "white")
           .style("fill", "none")
           .style("stroke-dasharray", ("4, 8"));
+
+        // add a label to each row, indicating which value (housing, healthcare etc.) is being added to the cumulative total
+        var text = svg.selectAll("text")
+          .data(dataset[1])
+          .enter().append("text")
+          .attr("y", function(d, i) { return xScale(i)+35; })     // value adjusts vertical position of labels
+          .attr("x", function(d) { return yScale(d.y0)+32; })      // value adjusts horizontal position of labels
+          .attr("fill", "#231f20")
+          .attr("class", "needs-label")
+          .text(function(d) { 
+            if (d.section != null) { return d.section + " +$" + d.y; } // only add label if 'section' exists in the object
+            else { return null; }                                      // TODO: destroy the text element instead of return null
+          })
+
+        // add svg icons to text labels
+        var icons = svg.selectAll("svg") 
+          .data(dataset[1])
+          .enter().append("svg:image")
+          .attr("xlink:href", function(d) {
+            if(d.icon != null) {
+              return "img/" + d.icon; }
+            else { return null; }
+          })
+          .attr("y", function(d, i) { return xScale(i)+16; })     
+          .attr("x", function(d) { return yScale(d.y0)+6; })
+          .attr("width", 20)      
+          .attr("height", 20);
+
+        // add below-the-bar icons -- TODO: add addl icons for subsequent bars at same x location...
+        var subIcons = svg.selectAll("svg")
+          .data(dataset[1])
+          .enter().append("svg:image")
+          .attr("xlink:href", function(d) {
+            if(d.icon != null) {
+              return "img/grey-" + d.icon; }
+            else { return null; }
+          })
+          .attr("y", function(d, i) { return xScale(i)+116; })     
+          .attr("x", function(d) { return yScale(d.y0)+(yScale(d.y)/2)-10; })
+          .attr("width", 20)      
+          .attr("height", 20);     
       }
 
       // DRAW ACTUAL BUDGET GRAPH
