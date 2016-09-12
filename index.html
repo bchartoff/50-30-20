@@ -60,15 +60,14 @@
       p, li {font-weight:400; font-size:1em;}
 
       .scenario p {margin: 0; text-align:left;}
-      .blue {color:#00a79d;}
-      .strong {font-size:1.7em; font-weight:700;}
+      .blue {font-weight:700; font-size:33px; line-height: 43px; color:#00a79d;} 
       .money-label {font-weight:400; font-size:0.5em; color:#231f20;}
       .graph-label {font-weight:400; font-size:1.7em; color:#231f20;}
       .actual-label {font-weight:400; font-size:1.7em; color:#231f20;}
       .needs-label {font-weight:400; font-size:1.5em; color:#231f20;}
 
 
-      img {display: block; margin: 0.5em auto;}
+      img {display: block; margin: 0.5em auto 1em auto;}
 
       .left {float:left;}
       .right {float:right;}
@@ -117,9 +116,9 @@
           <select name="location">
             <option value="average">Average</option>
           </select>
-          <p class="blue strong">$69,402</p>
-          <p class="blue strong">$4,577<span class="money-label">/month</span></p>
-          <p class="clear">$45,552 above federal poverty level.</p>
+          <p class="blue">$69,402</p>
+          <p class="blue">$4,577<span class="money-label">/month</span></p>
+          <p>$45,552 above federal poverty level.</p>
         </div>
       </div>
   </div>
@@ -439,7 +438,7 @@
           .attr("x", function(d) { return yScale(d.y0); })
           .attr("y", function(d, i) { return xScale(i)+50; })   // value adjusts vertical position of rects
           .attr("width", function(d) { return yScale(d.y); })
-          .attr("height", 60);                                  // sets height of each bar, no effect on position
+          .attr("height", 60);                                  // value sets height of each bar, no effect on position
 
         // add a label to each row, indicating which value (housing, healthcare etc.) is being added to the cumulative total
         var text = groups.selectAll("text")
@@ -451,7 +450,7 @@
           .attr("class", "needs-label")
           .text(function(d) { 
             if (d.section != null) { return d.section + " +$" + d.y; } // only add label if 'section' exists in the object
-            else { return null; }                                     // TODO: destroy the text element instead of return null
+            else { return null; }                                      // TODO: destroy the text element instead of return null
           })
 
         // add svg icons to text labels
