@@ -516,10 +516,10 @@
 
         // add svg icons to text labels
         var icons = svg.selectAll("svg") 
-          .data(dataset[1])
+          .data(dataset[1])                     // this now targets the second array in dataset, where caption info is stored
           .enter().append("svg:image")
           .attr("xlink:href", function(d) {
-            if(d.icon != null) {
+            if(d.icon != null) {                // TODO: probably don't need this conditional anymore
               return "img/" + d.icon; }
             else { return null; }
           })
