@@ -54,6 +54,7 @@
         font-family: 'Roboto Condensed', sans-serif;
         color: #231f20;}
 
+
       h1 {font-weight:400; font-size:4.0em;}
       h2 {font-weight:300; font-size:3.2em; margin-top:16px;}
       h3 {font-weight:700; font-size:1.2em; text-align:left;}
@@ -512,7 +513,7 @@
           .text(function(d) { 
             if (d.section != null) { return d.section + " +$" + d.y; } // only add label if 'section' exists in the object
             else { return null; }                                      // TODO: destroy the text element instead of return null
-          })
+          })                                                           // also: maybe don't need this conditional anymore?
 
         // add svg icons to text labels
         var icons = svg.selectAll("svg") 
@@ -532,6 +533,7 @@
         var subIcons = svg.selectAll("svg")
           .data(dataset[1])
           .enter().append("svg:image")
+          .attr("class", "subicon")
           .attr("xlink:href", function(d) {
             if(d.icon != null) {
               return "img/grey-" + d.icon; }
@@ -540,8 +542,24 @@
           .attr("y", function(d, i) { return xScale(i)+116; })     
           .attr("x", function(d) { return yScale(d.y0)+(yScale(d.y)/2)-10; })
           .attr("width", 20)      
-          .attr("height", 20);     
+          .attr("height", 20)
+          .each(function(d,i) { 
+            console.log(i);
+            for (n=i; n<4; n++) {
+              svg.selectAll("svg")
+                .data([d])
+                .enter().append("svg:image")
+                .attr("xlink:href", "img/grey-" + d.icon)
+                .attr("y", function(d, i) { return xScale(i)+260+(n*144); })
+                .attr("x", function(d) { return yScale(d.y0)+(yScale(d.y)/2)-10; })
+                .attr("width", 20)      
+                .attr("height", 20);
+            }
+          });
       }
+
+
+
 
       // DRAW ACTUAL BUDGET GRAPH
       function drawActual() {
@@ -602,30 +620,6 @@
             .attr("dx", function(d) { return yScale(d.y0)+10; })  // position horizontally
             .attr("dy", "80")                                       // shift down from top of svg
             .html(function(d) { return d.t1 + "% " + d.t2 + "<br /> $" + d.y; });
-
-/*
-        // add label line 1
-        var textLabelOne = svg.selectAll() // TODO: need to separate bold and reg trext via tspans
-          .data(dataset)
-          .enter().append("text")
-          .attr("class", "actual-label")
-          .style("font-weight", 700)
-          .attr("fill", "#231f20")
-          .attr("dx", function(d) { return yScale(d[0].y0)+10; })  // position horizontally
-          .attr("dy", "60")                                       // shift down from top of svg
-          .text(function(d) { return d[0].t1 + "% " + d[0].t2; });
-
-        // add label line 2
-        var textLabelTwo = svg.selectAll()
-          .data(dataset)
-          .enter().append("text")
-          .attr("class", "actual-label")
-          .attr("fill", "#231f20")
-          .attr("dx", function(d) { return yScale(d[0].y0)+10; })  // position horizontally
-          .attr("dy", "100")                                       // shift down from top of svg
-          .text(function(d) { return "$" + d[0].y; });
-
-          */
 
         // draw a line over the start of every rect
         var lines = groups.selectAll("line")
