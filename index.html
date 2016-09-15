@@ -56,9 +56,9 @@
 
 
       h1 {font-weight:400; font-size:4.0em;}
-      h2 {font-weight:300; font-size:3.2em; margin:0.4em 0;}
+      h2 {font-weight:300; font-size:3.2em; margin:0.4em 0 0.1em 0;}
       h3 {font-weight:700; font-size:1.2em; text-align:left;}
-      p, li {font-weight:400; font-size:1em;}
+      p, li {font-weight:400; font-size:1.2em;}
 
       .scenario p {margin: 0; text-align:left;}
       .blue {font-weight:700; font-size:33px; line-height: 43px; color:#00a79d;} 
@@ -67,16 +67,15 @@
       .actual-label {font-weight:400; font-size:1.7em; color:#231f20;}
       .needs-label {font-weight:400; font-size:1.5em; color:#231f20;}
 
-
       img {display: block; margin: 0.5em auto 1em auto;}
 
       .left {float:left;}
       .right {float:right;}
       .clear {clear:both;}
 
-
       svg {margin-bottom: 40px;}
 
+      /* TODO: convert from linear gradient to discreet background for each line, maybe draw in d3? */
       div#graph-needs svg {
         background: linear-gradient(to right, rgba(258,188,80,0.2), rgba(171,73,73,0.2));}
 
@@ -704,14 +703,14 @@
         var textLabelTwo = d3.selectAll(".actual-label")
           .append("tspan")
           .style("font-weight", 400)
-          .text(function(d) { return "% " + d.t2 })
+          .text(function(d) { return "% " + d.t2 });
 
         var textLabelThree = d3.selectAll(".actual-label")
           .append("tspan")
           .attr("x", function(d) { return yScale(d.y0)+10; })
           .attr("dy", 36)
           .style("font-weight", 400)
-          .text(function(d) { return "$" + d.y })
+          .text(function(d) { return "$" + d.y });
       }
 
 
@@ -734,7 +733,7 @@
 
                       if((Math.abs(a.left - b.left) * 2 < (a.width + b.width)) &&
                          (Math.abs(a.top - b.top) * 2 < (a.height + b.height))) { // hit detection...
-
+                            // 
 
 
 
