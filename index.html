@@ -73,14 +73,13 @@
       .right {float:right;}
       .clear {clear:both;}
 
-      svg {margin-bottom: 40px;}
+      svg.graph {margin-bottom: 40px;}
 
       /* TODO: convert from linear gradient to discreet background for each line, maybe draw in d3? */
       div#graph-needs svg {
         background: linear-gradient(to right, rgba(258,188,80,0.2), rgba(171,73,73,0.2));}
 
       div.scenario div div {padding:0 4em;} /* width of column contents in scenario section */
-
     </style>
 
 
@@ -557,6 +556,7 @@
               svg.selectAll("svg")
                 .data([d])
                 .enter().append("svg:image")
+                .attr("class", "subicon")
                 .attr("xlink:href", "img/grey-" + d.icon)
                 .attr("y", function(d, i) { return xScale(i)+260+(n*144); })  // vert - 260 is 116 + 144 (height of bar etc.)
                 .attr("x", function(d) { return yScale(d.y0)+(yScale(d.y)/2)-10; }) // horz - same as above
@@ -643,7 +643,6 @@
           .style("stroke-width", 4)
           .style("stroke", "white")
           .style("fill", "none");
-
 
 
         var dashedHeight = 80;
