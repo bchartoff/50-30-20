@@ -64,7 +64,7 @@
       .blue {font-weight:700; font-size:33px; line-height: 43px; color:#00a79d;} 
       .money-label {font-weight:400; font-size:0.5em; color:#231f20;}
       .graph-label {font-weight:400; font-size:1.7em; color:#231f20;}
-      .actual-label {font-weight:400; font-size:1.7em; color:#231f20;}
+      .actual-label {font-weight:400; font-size:1.8em; color:#231f20;}
       .needs-label {font-weight:400; font-size:1.5em; color:#231f20;}
 
       img {display: block; margin: 0.5em auto 1em auto;}
@@ -184,7 +184,7 @@
 
       // static js object to store balitmore family data
       // TODO: change this to generic object, pull city-specific data from csv as needed
-      var baltfam = new Object();
+      var baltfam = new Object(); // {};
         baltfam.city = "Baltimore, MD";
         baltfam.household = "Family";
         baltfam.income = 69402;
@@ -318,11 +318,11 @@
         var dataset = dataideal;
 
         // set up scales 
-        var xScale = d3.scale.ordinal()           // actually y scale, since we're doing horizontal bars
+        var xScale = d3.scale.ordinal()      // actually y scale, since we're doing horizontal bars
           .domain(d3.range(dataset[0].length))
           .rangeRoundBands([0, h]);
       
-        var yScale = d3.scale.linear()            // actually x scale
+        var yScale = d3.scale.linear()       // actually x scale
           .domain([0,       
             d3.max(dataset, function(d) {
               return d3.max(d, function(d) {
@@ -342,8 +342,7 @@
         // add a group for each row of data
         var groups = svg.selectAll("g")
           .data(dataset)
-          .enter()
-          .append("g")
+          .enter().append("g")
           .style("fill", function(d, i) {                  
             var fillColor;                                  
               if (i == 0) { fillColor = "#f8bc50";}         // yellow
@@ -572,6 +571,7 @@
 
         var dataset = dataactual;
         var h = 100; 
+        var barOffset = 160;
 
         // reset scales -- same as above...
         var xScale = d3.scale.ordinal()
@@ -591,9 +591,9 @@
         // create SVG element
         var svg = d3.select("#graph-actual")
               .append("svg")
-              .attr("class", "graph")
+              .attr("class", "graph ok")
               .attr("width", w)         
-              .attr("height", h+120);   // +120 opens up vertical space for annotation
+              .attr("height", h+240);   // +240 opens up vertical space for annotation
     
         // add a group for each row of data
         var groups = svg.selectAll("g")
@@ -612,9 +612,10 @@
           .data(function(d) { return d; })
           .enter().append("rect")
             .attr("x", function(d) { return yScale(d.y0); })
-            .attr("y", 128)               // 128 is to shift chart down to make way for annotation
+            .attr("y", barOffset)    // set vertical position of bar inside svg
             .attr("width", function(d) { return yScale(d.y); })
             .attr("height", xScale.rangeBand());
+
 
         // draw a line over the start of every rect
         var lines = groups.selectAll("line")
@@ -622,18 +623,8 @@
           .enter().append("line")
           .attr("x1", function(d) { return yScale(d.y0); }) 
           .attr("x2", function(d) { return yScale(d.y0); })        
-          .attr("y1", 128)
-          .attr("y2", lineHeight) 
-          .style("stroke-width", 4)
-          .style("stroke", "white")
-          .style("fill", "none");
-
-        // add the last line at the end of the graph
-        svg.append("line")
-          .attr("x1", w-2) 
-          .attr("x2", w-2) 
-          .attr("y1", 128) 
-          .attr("y2", lineHeight) 
+          .attr("y1", barOffset)  // top of line
+          .attr("y2", barOffset+h)  
           .style("stroke-width", 4)
           .style("stroke", "white")
           .style("fill", "none");
@@ -643,12 +634,24 @@
         lineFix.first()
           .attr('transform', 'translate(2,0)');
 
+        // add the last line at the end of the graph
+        svg.append("line")
+          .attr("x1", w-2) 
+          .attr("x2", w-2) 
+          .attr("y1", barOffset) 
+          .attr("y2", barOffset+h) 
+          .style("stroke-width", 4)
+          .style("stroke", "white")
+          .style("fill", "none");
+
+
+
         var dashedHeight = 80;
 
         // add dashed lines
         svg.append("line")
-          .attr("y1", h*3) 
-          .attr("y2", dashedHeight) 
+          .attr("y1", barOffset-60)   // 60 extends dashed line above bar
+          .attr("y2", barOffset+140) // 240 extends dashed line to bottom of svg
           .attr("x1", 2) 
           .attr("x2", 2) 
           .style("stroke-width", 4)
@@ -658,8 +661,8 @@
 
         // second dashed line
         svg.append("line")
-          .attr("y1", h*3) 
-          .attr("y2", dashedHeight) 
+          .attr("y1", barOffset-60)   // 60 extends dashed line above bar
+          .attr("y2", barOffset+140) // 240 extends dashed line to bottom of svg
           .attr("x1", function(d) { return yScale(baltfam.fifty); })
           .attr("x2", function(d) { return yScale(baltfam.fifty); })
           .style("stroke-width", 4)
@@ -669,8 +672,8 @@
 
         // third dashed line
         svg.append("line")
-          .attr("y1", h*3) 
-          .attr("y2", dashedHeight) 
+          .attr("y1", barOffset-60)   // 60 extends dashed line above bar
+          .attr("y2", barOffset+140) // 240 extends dashed line to bottom of svg
           .attr("x1", function(d) { return yScale(baltfam.fifty) + yScale(baltfam.thirty); })
           .attr("x2", function(d) { return yScale(baltfam.fifty) + yScale(baltfam.thirty); })
           .style("stroke-width", 4)
@@ -680,8 +683,8 @@
 
         // fourth dashed line
         svg.append("line")
-          .attr("y1", h*3) 
-          .attr("y2", dashedHeight) 
+          .attr("y1", barOffset-60)   // 60 extends dashed line above bar
+          .attr("y2", barOffset+140) // 240 extends dashed line to bottom of svg
           .attr("x1", w-2)
           .attr("x2", w-2)
           .style("stroke-width", 4)
@@ -696,8 +699,8 @@
             .attr("class", "actual-label")
             .style("font-weight", 700)
             .attr("fill", "#231f20")
-            .attr("dx", function(d) { return yScale(d.y0)+10; })  // position horizontally
-            .attr("dy", "72")                                       // shift down from top of svg
+            .attr("dx", function(d) { return yScale(d.y0)+10; })    // position horizontally
+            .attr("dy", barOffset - 60)                             // position vertically
             .text(function(d) { return d.t1; });
 
         var textLabelTwo = d3.selectAll(".actual-label")
@@ -707,10 +710,14 @@
 
         var textLabelThree = d3.selectAll(".actual-label")
           .append("tspan")
+          .attr("class", "labelThree")
           .attr("x", function(d) { return yScale(d.y0)+10; })
           .attr("dy", 36)
           .style("font-weight", 400)
           .text(function(d) { return "$" + d.y });
+
+        arrangeLabels();
+
       }
 
 
@@ -722,47 +729,68 @@
         var move = 1;
         while(move > 0) {
           move = 0;
-          svg.selectAll(".actual-label")
+          d3.selectAll(".actual-label")
              .each(function() {
                var that = this,
                    a = this.getBoundingClientRect(); // bounding box of current label
-               svg.selectAll(".actual-label")
+               d3.selectAll(".actual-label")
                   .each(function() {
                     if(this != that) {
                       var b = this.getBoundingClientRect(); // bounding box of label to compare to current label
 
                       if((Math.abs(a.left - b.left) * 2 < (a.width + b.width)) &&
                          (Math.abs(a.top - b.top) * 2 < (a.height + b.height))) { // hit detection...
-                            // 
 
+                        d3.select(this).attr("transform", "translate(" + -104 + "," + -72 + ")"); // move labels up and left
+                        d3.select(that).attr("transform", "translate(" + -208 + "," + -36 + ")");
 
+                        var c = this.getBoundingClientRect();
+                        var d = that.getBoundingClientRect();
 
+                        d3.select("svg.ok") // draw horizontal line for 3rd label
+                          .append("line")
+                          .attr("x1", c.right-92) 
+                          .attr("x2", c.right-32) 
+                          .attr("y1", 54)
+                          .attr("y2", 54) 
+                          .style("stroke-width", 4)
+                          .style("stroke", "#231f20")
+                          .style("fill", "none");
 
+                        d3.select("svg.ok") // draw vertical line
+                          .append("line")
+                          .attr("x1", c.right-34)
+                          .attr("x2", c.right-34) 
+                          .attr("y1", 54)
+                          .attr("y2", 140) 
+                          .style("stroke-width", 4)
+                          .style("stroke", "#231f20")
+                          .style("fill", "none");
 
+                        d3.select("svg.ok") // draw horizontal line for 2nd label
+                          .append("line")
+                          .attr("x1", d.right-92) 
+                          .attr("x2", d.right+86) 
+                          .attr("y1", 90)
+                          .attr("y2", 90) 
+                          .style("stroke-width", 4)
+                          .style("stroke", "#231f20")
+                          .style("fill", "none");
 
-                      // hit detection also needs to check that the bounding box isn't off the grid 
-                      // labels need to be grouped so they can be moved together...
-                      // actions:
-                      // - move the label up one lineHeight
-                      // - clear it to the left 100px at a time
-                      // - draw the connecting line
-                      // on to the next...
+                        d3.select("svg.ok") // draw vertical line
+                          .append("line")
+                          .attr("x1", d.right+84)
+                          .attr("x2", d.right+84) 
+                          .attr("y1", 90)
+                          .attr("y2", 140) 
+                          .style("stroke-width", 4)
+                          .style("stroke", "#231f20")
+                          .style("fill", "none");
 
+                          // this is all obviously tuned, will break on any change.
+                          // need a way to carry the original positional information 
+                          // forward into this function to correctly target the rect.
 
-                       /* 
-                        var dx = (Math.max(0, a.right - b.left) +
-                                 Math.min(0, a.left - b.right)) * 0.01,
-                            dy = (Math.max(0, a.bottom - b.top) +
-                                 Math.min(0, a.top - b.bottom)) * 0.02,
-                            tt = d3.transform(d3.select(this).attr("transform")),
-                            to = d3.transform(d3.select(that).attr("transform"));
-                        move += Math.abs(dx) + Math.abs(dy);
-                        to.translate = [ to.translate[0] + dx, to.translate[1] + dy ];
-                        tt.translate = [ tt.translate[0] - dx, tt.translate[1] - dy ];
-                        d3.select(this).attr("transform", "translate(" + tt.translate + ")");
-                        d3.select(that).attr("transform", "translate(" + to.translate + ")");
-                        a = this.getBoundingClientRect();
-                        */
                       }
                     }
                   });
@@ -772,23 +800,13 @@
 
     </script>
 
-                        <!-- 
-                        <input id="clickMe" type="button" value="clickme" onclick="arrangeLabels();" /> 
-                        -->
 
 <!-- 
 
       still to do: 
         fix labeling layout on actual budget
         map all text numbers to data points, most are currently static...
-        styling pass / convert to sass?
         object type, data input (csv?) and city / household selection
-
-      open design needs:
-        project title section?
-        city / household selection interface
-        updating labeling scheme for "actual budget" section?
-        easing / animation guidance
 
 -->
 
