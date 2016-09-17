@@ -75,8 +75,11 @@
 
       div#graph-ideal, div#graph-needs {margin-bottom: 40px;}
 
+      /* -- nice gradient, sad to lose
       div#graph-needs svg {
         background: linear-gradient(to right, rgba(258,188,80,0.2), rgba(171,73,73,0.2));}
+      */
+
       /* TODO: convert from linear gradient to discreet background for each line, maybe draw in d3? */
 
       div.scenario div div {padding:0 4em 2em 4em;} /* width of column contents in scenario section */
@@ -153,7 +156,7 @@
         <div id="graph-actual"></div>
       </div>
       <div class="small-12 medium-12 large-12 columns">
-        <p><br />Needs are <strong>$1,759</strong> and <strong>38%</strong> over the ideal budget which leaves this family little room for items they may want like a car or a cell phone or having any money to put towards savigns or debt repayment.</p>
+        <p><br />Needs are <strong>$1,759</strong> and <strong>38%</strong> over the ideal budget which leaves this family little room for items they may want like a car or a cell phone or having any money to put towards savings or debt repayment.</p>
       </div>
     </div>
 
@@ -320,23 +323,24 @@
       // DRAW IDEAL BUDGET GRAPH
       function drawIdeal() {
 
-        var h = 100; 
-        var dataset = dataideal;
+      var dataset = dataideal; 
+      var h = 100; 
 
-        // set up scales 
-        var xScale = d3.scale.ordinal()      // actually y scale, since we're doing horizontal bars
-          .domain(d3.range(dataset[0].length))
-          .rangeRoundBands([0, h]);
-      
-        var yScale = d3.scale.linear()       // actually x scale
-          .domain([0,       
-            d3.max(dataset, function(d) {
-              return d3.max(d, function(d) {
-                return d.y0 + d.y;
-              });
-            })
-          ])
-          .range([0, w]);
+      // set up scales 
+      var xScale = d3.scale.ordinal()      // actually y scale, since we're doing horizontal bars
+        .domain(d3.range(dataset[0].length))
+        .rangeRoundBands([0, h]);
+    
+      var yScale = d3.scale.linear()       // actually x scale
+        .domain([0,       
+          d3.max(dataset, function(d) {
+            return d3.max(d, function(d) {
+              return d.y0 + d.y;
+            });
+          })
+        ])
+        .range([0, w]);
+        
 
         // create SVG element
         var svg = d3.select("#graph-ideal")
@@ -422,10 +426,13 @@
 
       // DRAW NEEDS GRAPH 
       function drawNeeds() {
+
         var h = 720; 
         var dataset = dataneeds;
+        var bottomOffset = 34;
 
-        // reset scales -- TODO: would be nice to turn this into a function since it's the same across all 3 graphs...
+
+        // reset scales 
         var xScale = d3.scale.ordinal()              
           .domain(d3.range(dataset[0].length))
           .rangeRoundBands([0, h]); 
@@ -447,6 +454,31 @@
           .attr("width", w)
           .attr("height", h);    
 
+        // add background colors
+        svg.append("rect")
+          .attr("x", 0) 
+          .attr("y", 0) 
+          .attr("width", function(d) { return yScale(baltfam.fifty); })
+          .attr("height", h-bottomOffset)
+          .style("fill", "#f8bc50")
+          .style("fill-opacity", 0.18);
+
+        svg.append("rect")
+          .attr("x", function(d) { return yScale(baltfam.fifty); }) 
+          .attr("y", 0) 
+          .attr("width", function(d) { return yScale(baltfam.thirty); })
+          .attr("height", h-bottomOffset)
+          .style("fill", "#c66728")
+          .style("fill-opacity", 0.18);
+
+        svg.append("rect")
+          .attr("x", function(d) { return yScale(baltfam.fifty) + yScale(baltfam.thirty); }) 
+          .attr("y", 0) 
+          .attr("width", function(d) { return yScale(baltfam.twenty); })
+          .attr("height", h-bottomOffset)
+          .style("fill", "#ab4949")
+          .style("fill-opacity", 0.18);
+
         // add a group for each row of data
         var groups = svg.selectAll("g")
           .data(dataset)
@@ -454,7 +486,7 @@
           .style("fill", function(d, i) {                   
             var fillColor;                                  
               if (i == 0) { fillColor = "#f8bc50" ;}         // solid yellow
-              else if (i == 1) { fillColor = "url(#diagonal-stripe-2)" ;}    // pattern fill defined in svg in html, #fae9b8
+              else if (i == 1) { fillColor = "url(#diagonal-stripe-2)" ;}    // pattern fill defined in svg in html
               else if (i == 2) { fillColor = "#e8e8e8" ;}    // gray
             return fillColor;      
           });
@@ -470,7 +502,7 @@
 
         // first dashed line
         svg.append("line")
-          .attr("y1", h) 
+          .attr("y1", h-bottomOffset) 
           .attr("y2", 0) 
           .attr("x1", 2) 
           .attr("x2", 2) 
@@ -481,7 +513,7 @@
 
         // second dashed line - 50% of ideal budget
         svg.append("line")
-          .attr("y1", h) 
+          .attr("y1", h-bottomOffset) 
           .attr("y2", 0) 
           .attr("x1", function(d) { return yScale(baltfam.fifty); })
           .attr("x2", function(d) { return yScale(baltfam.fifty); })
@@ -492,7 +524,7 @@
 
         // third dashed line - next 30% of ideal budget
         svg.append("line")
-          .attr("y1", h) 
+          .attr("y1", h-bottomOffset) 
           .attr("y2", 0) 
           .attr("x1", function(d) { return yScale(baltfam.fifty) + yScale(baltfam.thirty); })
           .attr("x2", function(d) { return yScale(baltfam.fifty) + yScale(baltfam.thirty); })
@@ -503,7 +535,7 @@
 
         // fourth dashed line
         svg.append("line")
-          .attr("y1", h) 
+          .attr("y1", h-bottomOffset) 
           .attr("y2", 0) 
           .attr("x1", w-2)
           .attr("x2", w-2)
@@ -580,7 +612,7 @@
         var h = 100; 
         var barOffset = 160;
 
-        // reset scales -- same as above...
+        // reset scales 
         var xScale = d3.scale.ordinal()
           .domain(d3.range(dataset[0].length))
           .rangeRoundBands([0, h]);
