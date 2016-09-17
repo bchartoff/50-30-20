@@ -73,13 +73,15 @@
       .right {float:right;}
       .clear {clear:both;}
 
-      svg.graph {margin-bottom: 40px;}
+      div#graph-ideal, div#graph-needs {margin-bottom: 40px;}
 
-      /* TODO: convert from linear gradient to discreet background for each line, maybe draw in d3? */
       div#graph-needs svg {
         background: linear-gradient(to right, rgba(258,188,80,0.2), rgba(171,73,73,0.2));}
+      /* TODO: convert from linear gradient to discreet background for each line, maybe draw in d3? */
 
-      div.scenario div div {padding:0 4em;} /* width of column contents in scenario section */
+      div.scenario div div {padding:0 4em 2em 4em;} /* width of column contents in scenario section */
+
+
     </style>
 
 
@@ -91,9 +93,7 @@
     <div class="row scenario">
           <h2>Scenario:</h2>
       <div class="row">
-        <div class="large-12 columns">
-        </div>
-        <div class="small-12 large-4 columns">
+        <div class="small-12 medium-4 large-4 columns">
           <h3>LOCATION:</h3>
           <select name="location">
             <option value="balt">Baltimore, MD</option>
@@ -102,7 +102,7 @@
           <p>Population: 622,793 
           <p>Area: 92.98 mi&sup2;</p>
         </div>
-        <div class="small-12 large-4 columns">
+        <div class="small-12 medium-4 large-4 columns">
           <h3>HOUSEHOLD:</h3>
           <select name="household">
             <option value="family">2 adults 2 children</option>
@@ -111,7 +111,7 @@
           <p>Family of 4. Both adults work.</p>
           <p>One child is 4, the other is 8.</p>
         </div>
-        <div class="small-12 large-4 columns">
+        <div class="small-12 medium-4 large-4 columns">
           <h3>INCOME LEVEL:</h3>
           <select name="location">
             <option value="average">Average</option>
@@ -125,34 +125,34 @@
 
 
     <div class="row ideal">
-      <div class="small-12 large-12 columns">
+      <div class="small-12 medium-12 large-12 columns">
         <h2>Ideal Budget:</h2>
         <p>Monthly pay ($4,577) divided into what you should be spending in each category.</p>
       </div>
-      <div class="small-12 large-12 columns">
+      <div class="small-12 medium-12 large-12 columns">
         <div id="graph-ideal"></div>
       </div>
     </div>
 
     <div class="row needs">
-      <div class="small-12 large-12 columns">
+      <div class="small-12 medium-12 large-12 columns">
         <h2>Needs Total:</h2>
         <p>Adding each item in the needs category to find out what is being spend on average on necessities.</p>
       </div>
-      <div class="small-12 large-12 columns">
+      <div class="small-12 medium-12 large-12 columns">
         <div id="graph-needs"></div>
       </div>
     </div>
 
     <div class="row actual">
-      <div class="small-12 large-12 columns">
+      <div class="small-12 medium-12 large-12 columns">
         <h2>Actual Budget:</h2>
         <p>Taking the total amount spent on needs then figuring out if needs are under budget and what is left for wants and savings.</p>
       </div>
-      <div class="small-12 large-12 columns">
+      <div class="small-12 medium-12 large-12 columns">
         <div id="graph-actual"></div>
       </div>
-      <div class="small-12 large-12 columns">
+      <div class="small-12 medium-12 large-12 columns">
         <p><br />Needs are <strong>$1,759</strong> and <strong>38%</strong> over the ideal budget which leaves this family little room for items they may want like a car or a cell phone or having any money to put towards savigns or debt repayment.</p>
       </div>
     </div>
@@ -447,7 +447,7 @@
           .style("fill", function(d, i) {                   
             var fillColor;                                  
               if (i == 0) { fillColor = "#f8bc50" ;}         // solid yellow
-              else if (i == 1) { fillColor = "url(#diagonal-stripe-2)" ;}    // pattern fill defined in svg in html 
+              else if (i == 1) { fillColor = "url(#diagonal-stripe-2)" ;}    // pattern fill defined in svg in html, #fae9b8
               else if (i == 2) { fillColor = "#e8e8e8" ;}    // gray
             return fillColor;      
           });
