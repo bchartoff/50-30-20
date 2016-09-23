@@ -189,6 +189,10 @@
         // TODO:
         // - populate the dropdowns from csv
         // - reset the data and refresh the graphs based on user selection from dropdown
+<<<<<<< HEAD
+=======
+        console.log("from csv:", data);
+>>>>>>> master
 
         // read numerical values as numbers not strings
         data.forEach(function(d){ d['income'] = +d['income']; });
@@ -204,6 +208,12 @@
         data.forEach(function(d){ d['population'] = +d['population']; });
         data.forEach(function(d){ d['difference'] = +d['difference']; });
 
+<<<<<<< HEAD
+=======
+                data = data[0]; // kludge to select first object, needs to pull based on dropdowns
+
+
+>>>>>>> master
         // set derivative properties
         data.difference = data.income - 23850;
         data.fifty = Math.round(data.takehome * 0.5);
@@ -219,6 +229,11 @@
         data.overneeds = Math.round(data.needs - data.fifty);
         data.overneedsperc = (Math.round((data.needsperc - 0.5)*100))/100;
 
+<<<<<<< HEAD
+=======
+        console.log("processed:", data);
+
+>>>>>>> master
         // setup an array for each graph
         var dataideal = [
           [
@@ -232,6 +247,12 @@
           ]
         ];
 
+<<<<<<< HEAD
+=======
+        console.log("ideal:", dataideal);
+
+
+>>>>>>> master
         var dataneeds = [
           [
               { x: 0, y: 0 },                          
@@ -256,6 +277,11 @@
           ]
         ];
 
+<<<<<<< HEAD
+=======
+        console.log("needs:", dataneeds);
+
+>>>>>>> master
         var dataactual = [
           [
             { x: 0, y: data.needs, t1: data.needsperc, t2: "Needs:" }
@@ -268,6 +294,11 @@
           ]
         ];
 
+<<<<<<< HEAD
+=======
+        console.log("actual:", dataactual);
+
+>>>>>>> master
         // stack each array
         var stack = d3.layout.stack();
         stack(dataideal);
