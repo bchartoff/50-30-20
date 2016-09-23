@@ -205,7 +205,7 @@
         data.forEach(function(d){ d['population'] = +d['population']; });
         data.forEach(function(d){ d['difference'] = +d['difference']; });
 
-                data = data[0];
+                data = data[0]; // kludge to select first object, needs to pull based on dropdowns
 
 
         // set derivative properties
