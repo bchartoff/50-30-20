@@ -90,7 +90,7 @@
       <div class="small-12 medium-12 large-12 columns">
         <h2>Scenario:</h2>
       </div>
-      <div class="small-12 medium-4 large-4 columns">
+      <div class="small-12 medium-12 large-4 columns">
         <h3>LOCATION:</h3>
         <select name="location" id="location">
           <option value="balt">Baltimore, MD</option>
@@ -99,7 +99,7 @@
         <p>Population: 622,793 
         <p>Area: 92.98 mi&sup2;</p>
       </div>
-      <div class="small-12 medium-4 large-4 columns">
+      <div class="small-12 medium-12 large-4 columns">
         <h3>HOUSEHOLD:</h3>
         <select name="household" id="household">
           <option value="family">2 adults 2 children</option>
@@ -108,7 +108,7 @@
         <p>Family of 4. Both adults work.</p>
         <p>One child is 4, the other is 8.</p>
       </div>
-      <div class="small-12 medium-4 large-4 columns">
+      <div class="small-12 medium-12 large-4 columns">
         <h3>INCOME LEVEL:</h3>
         <select name="level" id="level">
           <option value="average">Average</option>
@@ -737,6 +737,7 @@
             .enter().append("rect")
               .attr("x", function(d) { return yScale(d.y0); })
               .attr("y", barOffset)    // set vertical position of bar inside svg
+              .attr("class", "actual-rect")    // set vertical position of bar inside svg
               .attr("width", function(d) { return yScale(d.y); })
               .attr("height", xScale.rangeBand());
 
@@ -831,6 +832,7 @@
             .style("font-weight", 400)
             .text(function(d) { return "% " + d.t2 });
 
+          // add label line 2
           var textLabelThree = d3.selectAll(".actual-label")
             .append("tspan")
             .attr("class", "labelThree")
@@ -843,82 +845,94 @@
 
         }
 
-
-
-
-
-        // WIP re-arrange labels to prevent overlap -- TODO: adapt this to shift labels left, connect to rect with line
+        // WIP re-arrange labels to prevent overlap
         function arrangeLabels() {
-          var move = 1;
-          while(move > 0) {
-            move = 0;
-            d3.selectAll(".actual-label")
-               .each(function() {
-                 var that = this,
-                     a = this.getBoundingClientRect(); // bounding box of current label
-                 d3.selectAll(".actual-label")
-                    .each(function() {
-                      if(this != that) {
-                        var b = this.getBoundingClientRect(); // bounding box of label to compare to current label
 
-                        if((Math.abs(a.left - b.left) * 2 < (a.width + b.width)) &&
-                           (Math.abs(a.top - b.top) * 2 < (a.height + b.height))) { // hit detection...
+          var secondLabel = document.getElementsByClassName("actual-label")[1];
+          var thirdLabel = document.getElementsByClassName("actual-label")[2];
+          var secondLabelThirdLine = document.getElementsByClassName("labelThree")[1];
+          var thirdLabelThirdLine = document.getElementsByClassName("labelThree")[2];
 
-                          d3.select(this).attr("transform", "translate(" + -104 + "," + -72 + ")"); // move labels up and left
-                          d3.select(that).attr("transform", "translate(" + -208 + "," + -36 + ")");
+          var a = secondLabel.getBoundingClientRect();
+          var b = thirdLabel.getBoundingClientRect();
 
-                          var c = this.getBoundingClientRect();
-                          var d = that.getBoundingClientRect();
+          var secondX = d3.select(secondLabel).attr("dx");
+          var secondY = d3.select(secondLabel).attr("dy");
+          var secondThirdX = d3.select(secondLabelThirdLine).attr("x");
 
-                          d3.select("svg.ok") // draw horizontal line for 3rd label
-                            .append("line")
-                            .attr("x1", c.right-92) 
-                            .attr("x2", c.right-32) 
-                            .attr("y1", 54)
-                            .attr("y2", 54) 
-                            .style("stroke-width", 4)
-                            .style("stroke", "#231f20")
-                            .style("fill", "none");
+          var thirdX = d3.select(thirdLabel).attr("dx");
+          var thirdY = d3.select(thirdLabel).attr("dy");
+          var thirdThirdX = d3.select(thirdLabelThirdLine).attr("x");
 
-                          d3.select("svg.ok") // draw vertical line
-                            .append("line")
-                            .attr("x1", c.right-34)
-                            .attr("x2", c.right-34) 
-                            .attr("y1", 54)
-                            .attr("y2", 140) 
-                            .style("stroke-width", 4)
-                            .style("stroke", "#231f20")
-                            .style("fill", "none");
+          // detect overlap between second and third labels
+          if((Math.abs(a.left - b.left) * 2 < (a.width + b.width)) && 
+             (Math.abs(a.top - b.top) * 2 < (a.height + b.height))) { 
 
-                          d3.select("svg.ok") // draw horizontal line for 2nd label
-                            .append("line")
-                            .attr("x1", d.right-92) 
-                            .attr("x2", d.right+86) 
-                            .attr("y1", 90)
-                            .attr("y2", 90) 
-                            .style("stroke-width", 4)
-                            .style("stroke", "#231f20")
-                            .style("fill", "none");
+            d3.select(secondLabel)
+              .attr("dx", secondX-208)
+              .attr("dy", secondY-36);
+            d3.select(secondLabelThirdLine)
+              .attr("x", secondThirdX-208);
 
-                          d3.select("svg.ok") // draw vertical line
-                            .append("line")
-                            .attr("x1", d.right+84)
-                            .attr("x2", d.right+84) 
-                            .attr("y1", 90)
-                            .attr("y2", 140) 
-                            .style("stroke-width", 4)
-                            .style("stroke", "#231f20")
-                            .style("fill", "none");
+            d3.select(thirdLabel)
+              .attr("dx", thirdX-104)
+              .attr("dy", thirdY-72);
+            d3.select(thirdLabelThirdLine)
+              .attr("x", thirdThirdX-104);
 
-                            // this is all obviously tuned, only works at certain widths
-                            // need a way to carry the original positional information 
-                            // forward into this function to correctly target the rect
+            var thisLabel = secondLabel.getBBox();
+            var thisRect = document.getElementsByClassName('actual-rect')[1].getBBox();
+            var tspanWidth = document.getElementsByClassName('labelThree')[1].getComputedTextLength();
 
-                        }
-                      }
-                    });
-               });
+            // draw lines from 2nd label
+            d3.select("svg.ok") // horizontal
+              .append("line")
+              .attr("x1", thisLabel.x + tspanWidth+10) 
+              .attr("y1", 90)
+              .attr("x2", thisRect.x + (thisRect.width / 2) + 2 ) 
+              .attr("y2", 90) 
+              .style("stroke-width", 4)
+              .style("stroke", "#231f20")
+              .style("fill", "none");
+
+            d3.select("svg.ok") // vertical
+              .append("line")
+              .attr("x1", thisRect.x + (thisRect.width / 2) ) 
+              .attr("y1", 90)
+              .attr("x2", thisRect.x + (thisRect.width / 2) ) 
+              .attr("y2", 140) 
+              .style("stroke-width", 4)
+              .style("stroke", "#231f20")
+              .style("fill", "none");
+
+            var thisLabel = thirdLabel.getBBox();
+            var thisRect = document.getElementsByClassName('actual-rect')[2].getBBox();
+            var tspanWidth = document.getElementsByClassName('labelThree')[2].getComputedTextLength();
+
+            // draw lines from 2nd label
+            d3.select("svg.ok") // horizontal
+              .append("line")
+              .attr("x1", thisLabel.x + tspanWidth+10) 
+              .attr("y1", 54)
+              .attr("x2", thisRect.x + (thisRect.width / 2) + 2 ) 
+              .attr("y2", 54) 
+              .style("stroke-width", 4)
+              .style("stroke", "#231f20")
+              .style("fill", "none");
+
+            d3.select("svg.ok") // vertical
+              .append("line")
+              .attr("x1", thisRect.x + (thisRect.width / 2) ) 
+              .attr("y1", 54)
+              .attr("x2", thisRect.x + (thisRect.width / 2) ) 
+              .attr("y2", 140) 
+              .style("stroke-width", 4)
+              .style("stroke", "#231f20")
+              .style("fill", "none");
+
           }
+
+
         }
       });
 
@@ -929,14 +943,6 @@
     </script>
 
 
-<!-- 
-
-      still to do: 
-        fix labeling layout on actual budget
-        map all text numbers to data points, most are currently static...
-        object type, data input (csv?) and city / household selection
-
--->
 
 
 
