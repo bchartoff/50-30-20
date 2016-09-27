@@ -1,8 +1,6 @@
 
 d3.csv("csv/data.csv", function(data) {
 
-  console.log("from csv:", data);
-
   // read numerical values as numbers not strings
   data.forEach(function(d){ d['income'] = +d['income']; });
   data.forEach(function(d){ d['takehome'] = +d['takehome']; });
@@ -17,76 +15,37 @@ d3.csv("csv/data.csv", function(data) {
   data.forEach(function(d){ d['population'] = +d['population']; });
   data.forEach(function(d){ d['difference'] = +d['difference']; });
 
-// TODO: merge these three things into one function... 
-
-  // grab unique LOCATION values from csv data
-  var unique = {};
-  var distinct = [];
-  for (var i in data) {
-    if (typeof(unique[data[i].city]) == "undefined") {
-      distinct.push(data[i].city);
+  // get unique values for all three dropdowns and populate them
+  function getUniques(dd) {
+    var unique = {};
+    var distinct = [];
+    for (var i in data) {
+      if (typeof(unique[data[i][dd]]) == "undefined") {
+        distinct.push(data[i][dd]);
+      }
+      unique[data[i][dd]] = 0;
     }
-    unique[data[i].city] = 0;
-  }
-  // clear the locations dropdown
-  $('#location option').each(function() {
-    $(this).remove();
-  });
-  // populate locations dropdown with unique values
-  var option = '';
-  for (var i = 0; i < distinct.length; i++) {
-    option += '<option value="' + distinct[i] + '">' + distinct[i] + '</option>';
-  }
-  $('#location').append(option);
-
-
-  // grab unique HOUSEHOLD values from csv data
-  var unique = {};
-  var distinct = [];
-  for (var i in data) {
-    if (typeof(unique[data[i].household]) == "undefined") {
-      distinct.push(data[i].household);
+    // clear dropdown options
+    $('#' + dd + ' option').each(function() {
+      $(this).remove();
+    });
+    // populate dropdown with unique values
+    var option = '';
+    for (var i = 0; i < distinct.length; i++) {
+      option += '<option value="' + distinct[i] + '">' + distinct[i] + '</option>';
     }
-    unique[data[i].household] = 0;
+    $('#' + dd).append(option);    
   }
-  // clear the household dropdown
-  $('#household option').each(function() {
-    $(this).remove();
-  });
-  // populate household dropdown with unique values
-  var option = '';
-  for (var i = 0; i < distinct.length; i++) {
-    option += '<option value="' + distinct[i] + '">' + distinct[i] + '</option>';
-  }
-  $('#household').append(option);
 
-
-  // grab unique INCOME LEVEL values from csv data
-  var unique = {};
-  var distinct = [];
-  for (var i in data) {
-    if (typeof(unique[data[i].level]) == "undefined") {
-      distinct.push(data[i].level);
-    }
-    unique[data[i].level] = 0;
-  }
-  // clear the income level dropdown
-  $('#level option').each(function() {
-    $(this).remove();
-  });
-  // populate income level dropdown with unique values
-  var option = '';
-  for (var i = 0; i < distinct.length; i++) {
-    option += '<option value="' + distinct[i] + '">' + distinct[i] + '</option>';
-  }
-  $('#level').append(option);
+  getUniques('city');
+  getUniques('household');
+  getUniques('level');
 
   // get value of dropdowns
   var selected = {};
-    selected.city = $('select#location option:selected').val();
+    selected.city = $('select#city option:selected').val();
     selected.household = $('select#household option:selected').val();
     selected.level = $('select#level option:selected').val();
-    console.log(selected);
 
   // select data row based on value
   function isSelected() {
@@ -99,7 +58,9 @@ d3.csv("csv/data.csv", function(data) {
   }
   var selectedScenario = data.findIndex(isSelected);
 
+  // reduce data object to selected row
   data = data[selectedScenario];
+
 
   // set derivative properties
   data.difference = data.income - 23850;
