@@ -1,5 +1,5 @@
 
-var data, dataideal, dataneeds, dataactual;
+var allScenarios, data, dataideal, dataneeds, dataactual;
 
 d3.csv("csv/data.csv", function(csv) {
   // read numerical values as numbers not strings
@@ -15,15 +15,89 @@ d3.csv("csv/data.csv", function(csv) {
   csv.forEach(function(d){ d['twenty'] = +d['twenty']; });
   csv.forEach(function(d){ d['population'] = +d['population']; });
   csv.forEach(function(d){ d['difference'] = +d['difference']; });
-  data = csv;
+  data = csv; // pass csv values to the global 'data' object
+  allScenarios = csv; // also pass them to this object that -doesn't- get changed in scenario setup
 
   // get unique values for all three dropdowns and populate them
   getUniques('city');
   getUniques('household');
   getUniques('level');
 
-  setScenario(); // get current value of dropdowns and set scenario
+  setupAndDraw(); // draw the graphs
+
+});
+
+// listen for dropdown selections and update graphs
+d3.selectAll('select')
+  .on('change', function() {
+    data = allScenarios; // reset 'data' to include all scenarios 
+    d3.selectAll("svg.graph").remove(); // clear any existing graphs
+    setupAndDraw();
+});
+
+function setupAndDraw() {
+  setScenario(); // get current value of dropdowns and set 'data' to the selected scenario
   setProps(); // set derivative properties
+  setupData(); // create a stacked array for each graph
+
+  // draw each graph
+  drawIdeal();
+  drawNeeds();
+  drawActual();
+}
+
+function getUniques(dd) {
+  var unique = {};
+  var distinct = [];
+  for (var i in data) {
+    if (typeof(unique[data[i][dd]]) == "undefined") {
+      distinct.push(data[i][dd]);
+    }
+    unique[data[i][dd]] = 0;
+  }
+  $('#' + dd + ' option').each(function() {     // clear dropdown options
+    $(this).remove();     
+  });
+  var option = '';
+  for (var i = 0; i < distinct.length; i++) {   // populate dropdown with unique values
+    option += '<option value="' + distinct[i] + '">' + distinct[i] + '</option>';
+  }
+  $('#' + dd).append(option);    
+};
+
+function setScenario() {
+  var selected = {};
+    selected.city = $('select#city option:selected').val();
+    selected.household = $('select#household option:selected').val();
+    selected.level = $('select#level option:selected').val();
+  console.log(selected);
+  // select data row based on value
+  for (i=0;i<data.length;i++) {
+    if (data[i].city == selected.city) {
+      console.log(selected.city);
+      if (data[i].household == selected.household) 
+        data = data[i];   // reduce data object to selected row
+    }
+  }
+};
+
+function setProps() {
+  data.difference = data.income - 23850;
+  data.fifty = Math.round(data.takehome * 0.5);
+  data.thirty = Math.round(data.takehome * 0.3);
+  data.twenty = Math.round(data.takehome * 0.2);
+  data.needs = data.housing + data.health + data.grocery + data.transit + data.childcare;
+  data.lo = data.takehome - data.needs;
+  data.lowants = Math.round(data.lo * 0.6);
+  data.losaves = Math.round(data.lo * 0.4);
+  data.needsperc = Math.round((data.needs / data.takehome)*100);
+  data.wantsperc = Math.round((data.lowants / data.takehome)*100);
+  data.savesperc = Math.round((data.losaves / data.takehome)*100);
+  data.overneeds = Math.round(data.needs - data.fifty);
+  data.overneedsperc = (Math.round((data.needsperc - 0.5)*100))/100;
+};
+
+function setupData() {
 
   // setup an array for each graph
   dataideal = [
@@ -79,67 +153,9 @@ d3.csv("csv/data.csv", function(csv) {
   stack(dataideal);
   stack(dataactual);
   stack(dataneeds);
-
-  d3.selectAll("svg.graph").remove();
-  drawIdeal();
-  drawNeeds();
-  drawActual();
-});
+};
 
 
-function getUniques(dd) {
-  var unique = {};
-  var distinct = [];
-  for (var i in data) {
-    if (typeof(unique[data[i][dd]]) == "undefined") {
-      distinct.push(data[i][dd]);
-    }
-    unique[data[i][dd]] = 0;
-  }
-  $('#' + dd + ' option').each(function() {     // clear dropdown options
-    $(this).remove();     
-  });
-  var option = '';
-  for (var i = 0; i < distinct.length; i++) {   // populate dropdown with unique values
-    option += '<option value="' + distinct[i] + '">' + distinct[i] + '</option>';
-  }
-  $('#' + dd).append(option);    
-}
-
-function setScenario() {
-  var selected = {};
-    selected.city = $('select#city option:selected').val();
-    selected.household = $('select#household option:selected').val();
-    selected.level = $('select#level option:selected').val();
-  // select data row based on value
-  function isSelected() {
-    for (i=0;i<data.length;i++) {
-      if (data[i].city == selected.city) {
-        if (data[i].household == selected.household)
-          return data[i]; // TODO: add income level
-      }
-    }
-  }
-  var selectedScenario = data.findIndex(isSelected);
-  // reduce data object to selected row
-  data = data[selectedScenario];
-}
-
-function setProps() {
-  data.difference = data.income - 23850;
-  data.fifty = Math.round(data.takehome * 0.5);
-  data.thirty = Math.round(data.takehome * 0.3);
-  data.twenty = Math.round(data.takehome * 0.2);
-  data.needs = data.housing + data.health + data.grocery + data.transit + data.childcare;
-  data.lo = data.takehome - data.needs;
-  data.lowants = Math.round(data.lo * 0.6);
-  data.losaves = Math.round(data.lo * 0.4);
-  data.needsperc = Math.round((data.needs / data.takehome)*100);
-  data.wantsperc = Math.round((data.lowants / data.takehome)*100);
-  data.savesperc = Math.round((data.losaves / data.takehome)*100);
-  data.overneeds = Math.round(data.needs - data.fifty);
-  data.overneedsperc = (Math.round((data.needsperc - 0.5)*100))/100;
-}
 
 // set global dimenions
 var w = d3.select("div.row").node().getBoundingClientRect().width - 30;  // global width - pull from foundation row width
@@ -691,13 +707,3 @@ function arrangeLabels() {
       .style("fill", "none");
   }
 }
-
-
-
-
-
-
-
-
-
-
